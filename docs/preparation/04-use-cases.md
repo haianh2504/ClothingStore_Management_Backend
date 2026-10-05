@@ -209,7 +209,7 @@ Administrator
 **Main flow:**
 
 1. The customer reviews the cart.
-2. The customer enters their name, phone number, optional email address, and delivery address.
+2. The customer enters their name, phone number, optional email address, and delivery address ( temporarily basic string ).
 3. The customer selects **Place Order**.
 4. The frontend sends the guest identifier and customer information to the system.
 5. The system retrieves the cart and its items.
@@ -381,7 +381,7 @@ Administrator
 
 1. The administrator opens the selected product's variant management section.
 2. The administrator selects **Add Variant**.
-3. The administrator enters the variant color, size, stock quantity, price, and image.
+3. The administrator enters the variant color, size, stock quantity, and image.
 4. The administrator submits the variant information.
 5. The system validates the submitted variant information.
 6. The system verifies that the same color and size combination does not already exist for the product.

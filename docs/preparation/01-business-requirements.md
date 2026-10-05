@@ -10,19 +10,18 @@ The project is intended for learning CRUD operations, Spring Boot, JPA, Hiber
 - Can add / remove / update a specific product
 - Can cancel specific orders which not allowed or invalid
 - Can view an order list and order details
-- Can update an order's status according to the allowed transitions 
+- Can update an order's status according to the allowed transitions
 - Admin can only interact with the website only via Admin Login with username and password
 
 ## 3. Customer
 
 - Can browse clothing products
-- Manage a shopping cart ( add, remove, change cart items )
+- Manage a guest shopping cart ( add, remove, change cart items )
 - Do not have to login or register for shopping service and product browsing
 - Have to provide contact and delivery details for a demo order
 
 ## 4. Business Rules
 
-- Product prices and stock quantities cannot be negative
 - Ordered quantities must be positive whole numbers
 - Only `ACTIVE` products with `sufficient stock` can be ordered
 - The order's total price is calculated from each item's price at order time multiplied by its quantity
@@ -30,6 +29,12 @@ The project is intended for learning CRUD operations, Spring Boot, JPA, Hiber
 - An order lookup succeeds only when both the order code and the checkout phone number match.
 - Demo orders do not collect payment and do not represent a real delivery process.
 - Order records and their item details are not hard-deleted.
+### 4.1 Product Business Rules
+
+- Product's name must be unique
+- Product prices and stock quantities cannot be negative.
+- A product must has a `name`, its `category` and `sale_status` is `INACTIVE` when it was first created.
+- To `Activate` an `INACTIVE` product, make sure its details `are fully filled in`, and that product must have 1 `variant` with valid info.
 
 ## 5. Order Placement Flow
 
