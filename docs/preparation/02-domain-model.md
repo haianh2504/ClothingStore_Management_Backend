@@ -2,21 +2,21 @@
 
 ### Main Entities
 
-| Entity      | Attributes                                                                                                                                     |     |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | --- |
-| **Admin**   | `email`, `password_hash`                                                                                                                       |     |
-| **Product** | `id`, `name`, `description`, `category`, `price`, `sale_status`                                                                                |     |
-| **Order**   | `id`, `order_code` `customer_name`, `customer_phone_number`, `customer_email`, `delivery_address`, `total_price`, `order_status`, `created_at` |     |
-| **Cart**    | `id`, `guest_id`                                                                                                                               |     |
+| Entity      | Attributes                                                                                                 |     |
+| ----------- | ---------------------------------------------------------------------------------------------------------- | --- |
+| **Admin**   | `email`, `passwordHash`                                                                                    |     |
+| **Product** | `id`, `name`, `description`, `category`, `price`, `saleStatus`                                             |     |
+| **Order**   | `orderCode` `customerName`, `phoneNumber`, `email`, `deliveryAddress`, `totalPrice`, `status`, `createdAt` |     |
+| **Cart**    | `id`, `guestId`                                                                                            |     |
+
 
 ### Supporting Entities
 
-| Entity             | Attributes                                                                |     |     |
-| ------------------ | ------------------------------------------------------------------------- | --- | --- |
-| **CartItem**       | `id`, `cart_id`, `product_variant_id`, `quantity`                         |     |     |
-| **OrderItem**      | `id`, `order_id`, `product_name`, `size,`quantity`, `color`, `unit_price` |     |     |
-| **ProductVariant** | `id`, `product_id`, `size`, `quantity`, `image_url`, `color`              |     |     |
-|                    |                                                                           |     |     |
+| Entity             | Attributes                                                                            |     |     |
+| ------------------ | ------------------------------------------------------------------------------------- | --- | --- |
+| **CartItem**       | `id`, `cartId`, `variantId`, `quantity`                                               |     |     |
+| **OrderItem**      | `id`, `variantId` ,`orderCode`, `productName`, `size, `quantity`, `color`,`unitPrice` |     |     |
+| **ProductVariant** | `id`, `productId`, `size`, `quantity`, `imageUrl`, `color`                            |     |     |
 
 
 ### Enumerations
