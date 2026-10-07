@@ -313,4 +313,370 @@ Body:
 ### BAD PATH:
 **Error Responses about `X-Guest-Id` in header**
 
+
 ## UC06: Place Order
+
+### REQUESTS:
+
+**Header:** `X-Guest-Id`
+
+**Endpoint**: `POST /api/v1/orders`
+
+**Request Body:**
+```json
+{
+  "customerName": "Phan Hai Anh",
+  "phoneNumber": "09329838551",
+  "email": "haianh260406@gmail.com",
+  "deliveryAddress": "72A-KP3-T09, Phuong An Binh, Bien Hoa, Dong Nai"
+}
+```
+
+**Request Parameters:** none
+
+**Path Parameters**: none
+
+
+### SUCCESS PATH:
+
+**1. Success Response:**
+Status: `201 CREATED`
+
+**Response Headers**:
+```
+HTTP/1.1 201 Created
+Content-Type: application/json
+```
+
+Body:
+```json
+{
+   "status": 201,
+   "code": "ORDER_CREATED",
+   "message": "Order created successfully",
+   "data":{
+      "orderCode": "AB1233422MXY",
+      "status": "PENDING",
+      "createdAt": "2026-10-07T13:30:00+07:00",
+      "items":[
+        {
+            "orderItemId":1,
+            "variantId":132,
+            "productName": "T-shirt hella",
+            "size": "M",
+            "quantity": 2,
+            "color": "red",
+            "unitPrice": "20000" 
+        },
+        {
+            "orderItemId":2,
+            "variantId":124,
+            "productName": "Pants hella",
+            "size": "XL",
+            "quantity": 3,
+            "color": "black",
+            "unitPrice": "30000" 
+        }
+      ],
+      "totalItems":2,
+      "totalQuantity":5,
+      "totalPrice": "130000"
+   }
+}
+```
+
+
+### BAD PATH:
+
+**1. Error Response - empty cart:**
+Status: `422 Unprocessable Entity`
+Body:
+```json
+{
+   "status": 422,
+   "code": "CART_EMPTY",
+   "message": "Failed: There are no items in cart to place order",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+**2. Error Response - cart does not exist:**
+Status: `404 Not Found`
+Body:
+```json
+{
+   "status": 404,
+   "code": "CART_NOT_FOUND",
+   "message": "Failed: Cart not found",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+**3. Error Response - Invalid customer's information ( wrong format ):**
+Status: `400 Bad Request`
+Body:
+```json
+{
+   "status": 400,
+   "code": "INVALID_INFORMATION_PROVIDED",
+   "message": "Failed: Invalid details provided",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "error":[
+     {
+        "field": "customerName",
+        "message": "Failed: Invalid Customer's Name"
+     },
+     {
+        "field": "phoneNumber",
+        "message": "Failed: Invalid phoneNumber"
+     },
+     {
+        "field": "email",
+        "message": "Failed: Invalid email"
+     },
+     {
+        "field": "deliveryAddress",
+        "message": "Failed: Invalid delivery address"
+     }
+   ]
+}
+```
+
+**4. Error Response - a product is inactive or unavailable or has insufficient stock:**
+Status: `422 Unprocessable Entity`
+Body:
+```json
+{
+   "status": 422,
+   "code": "PRODUCT_UNAVAILABLE",
+   "message": "Failed:",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "error":[
+      {
+         "variantId": 132,
+         "availability": "PRODUCT_INACTIVE"
+      },
+      {
+         "variantId": 124,
+         "availability": "STOCK_INSUFFICIENT"
+      }, 
+   ]
+}
+```
+
+**5. Error Response -  any operation fails while creating the order, creating order items, decreasing stock, or clearing the cart:**
+Status: `409 Conflict`
+Body:
+```json
+{
+   "status": 409,
+   "code": "OPERATION_FAILED",
+   "message": "Failed: There is a problem while handling placing order",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+}
+```
+
+**6. Error Responses about `X-Guest-Id` in header**
+
+
+
+# Supporting API contract flow:
+
+
+## UC01 Browse All Products
+
+### REQUEST:
+
+**Endpoint:** `GET /api/v1/products`
+
+**Request Body:** none
+
+**Request Parameters:** none
+
+**Path Parameters**: none
+
+### SUCCESS PATH:
+
+**1. Success Response - There are `ACTIVE` products:**
+Status: `200 Ok`
+Body:
+```json
+{
+   "status": 200,
+   "code": "PRODUCT_RETRIEVED_SUCCESSFULLY",
+   "message": "Product retrieving successfully",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "data":[
+       {
+          "category": "TOPS",
+          "items":[
+             {
+                "productId": 1,
+                "productName": "T-shirt 01",
+                "description": "......",
+                "unitPrice": "50000"
+             },
+             {
+                "productId": 2,
+                "productName": "Jacket 02",
+                "description": "......",
+                "unitPrice": "120000"
+             }
+          ]
+       },
+       {
+          "category": "BOTTOMS",
+          "items":[
+             {
+                "productId": 3,
+                "productName": "Pants 01",
+                "description": "......",
+                "unitPrice": "40000"
+             },
+             {
+                "productId": 4,
+                "productName": "Shorts 03",
+                "description": "......",
+                "unitPrice": "30000"
+             }
+          ]
+       },
+       {
+          "category": "ACCESSORIES",
+          "items":[
+             {
+                "productId": 7,
+                "productName": "Necklace 07",
+                "description": "......",
+                "unitPrice": "80000"
+             },
+             {
+                "productId": 10,
+                "productName": "Wrist 05",
+                "description": "......",
+                "unitPrice": "110000"
+             }
+          ]
+       },
+   ]
+}
+```
+
+**2. Success Response - There are NO `ACTIVE` products:**
+Status: `200 Ok`
+Body:
+```json
+{
+   "status": 200,
+   "code": "PRODUCT_RETRIEVED_SUCCESSFULLY",
+   "message": "Product retrieving successfully",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "data":[
+       {
+          "category": "TOPS",
+          "items":[]
+       },
+       {
+          "category": "BOTTOMS",
+          "items":[]
+       },
+       {
+          "category": "ACCESSORIES",
+          "items":[]
+       },
+   ]
+}
+```
+
+
+
+## UC01.1  Browse Product Variants
+
+### REQUEST:
+
+**Endpoint:** `GET /api/v1/products/{productId}/variants`
+
+**Request Body:** none
+
+**Request Parameters:** none
+
+**Path Parameters**:
+
+| Parameter   | Type | Required |
+| :---------- | :--- | :------- |
+| `productId` | Long | Yes      |
+
+### SUCCESS PATH:
+
+**1. Success Response:**
+Status: `200 Ok`
+Body:
+```json
+{
+   "status": 200,
+   "code": "PRODUCT_VARIANT_RETRIEVED_SUCCESSFULLY",
+   "message": "Product's Variants retrieving successfully",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "items":[
+      {
+         "variantId": 1,
+         "color": "red",
+         "size": "M",
+         "quantity": 5,
+         "imageUrl": "https://....."
+      },
+      {
+         "variantId": 2,
+         "color": "blue",
+         "size": "XL",
+         "quantity": 4,
+         "imageUrl": "https://....."
+      },
+      {
+         "variantId": 3,
+         "color": "blue",
+         "size": "M",
+         "quantity": 6,
+         "imageUrl": "https://....."
+      },
+      {
+         "variantId": 4,
+         "color": "red",
+         "size": "XL",
+         "quantity": 0, // will be blurred in UI
+         "imageUrl": "https://....."
+      }
+   ]
+}
+```
+
+
+### BAD PATH:
+
+**1. Error Response - product not found:**
+Status: `404 Not Found`
+Body:
+```json
+{
+   "status": 404,
+   "code": "PRODUCT_NOT_FOUND",
+   "message": "Failed: Product [id=123] not found"
+}
+```
+
+**2. Error Response - product `INACTIVE`:**
+Status: `422 Unprocessable Entity`
+Body:
+```json
+{
+   "status": 422,
+   "code": "PRODUCT_INACTIVE",
+   "message": "Failed: Product [id=123] is inactive"
+}
+```
+
+
+
+## UC01.2  Filter Products
+
+### REQUEST: 

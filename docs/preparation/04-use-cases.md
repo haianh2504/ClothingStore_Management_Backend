@@ -3,7 +3,9 @@
 ```
 Customer
 ├── Product
-│   └── UC01 Browse Products
+│   ├── UC01 Browse All Products
+│   ├── UC01.1 Browse Product Variants
+│   └── UC01.2 Filter Products
 │
 ├── Cart / CartItem
 │   ├── UC02 Add Product Variant to Cart
@@ -35,7 +37,7 @@ Administrator
     └── UC17 Cancel Order
 ```
 
-## UC01 Browse Products
+## UC01 Browse All Products
 
 **Actor:** Customer
 
@@ -59,6 +61,44 @@ Administrator
 - No data is changed.
 
 ---
+
+## UC01.1 Browse Product Variants
+
+**Actor:** Customer
+
+**Preconditions:** None
+
+**Main flow:**
+
+
+**Alternative flows:**
+
+
+**Postconditions:**
+
+- No data is changed.
+
+---
+
+## UC01.2  Filter Producta
+
+**Actor:** Customer
+
+**Preconditions:** None
+
+**Main flow:**
+
+
+**Alternative flows:**
+
+
+**Postconditions:**
+
+- No data is changed.
+
+
+---- 
+
 
 ## UC02 Add Product Variant to Cart
 
