@@ -66,13 +66,17 @@ Administrator
 
 **Actor:** Customer
 
-**Preconditions:** None
+**Preconditions:** `ACTIVE` Products are displayed already at product page.
 
 **Main flow:**
 
+1. The customer clicks to see more about the product they prefer.
+2. The system retrieves persisted variants of that product.
+3. The system displays the product's basic information, variants' information including their id.
 
 **Alternative flows:**
 
+- If product Id not found, or inactive, display error page with basic information to their customer.
 
 **Postconditions:**
 
@@ -80,13 +84,13 @@ Administrator
 
 ---
 
-## UC01.2  Filter Producta
+## UC01.2  Filter Products
 
 **Actor:** Customer
 
 **Preconditions:** None
 
-**Main flow:**
+**Main flow:** temporarily unfinished
 
 
 **Alternative flows:**

@@ -459,7 +459,7 @@ Body:
       {
          "variantId": 124,
          "availability": "STOCK_INSUFFICIENT"
-      }, 
+      }
    ]
 }
 ```
@@ -472,7 +472,7 @@ Body:
    "status": 409,
    "code": "OPERATION_FAILED",
    "message": "Failed: There is a problem while handling placing order",
-   "timestamp": "2026-10-02T14:30:00+07:00",
+   "timestamp": "2026-10-02T14:30:00+07:00"
 }
 ```
 
@@ -557,7 +557,7 @@ Body:
                 "unitPrice": "110000"
              }
           ]
-       },
+       }
    ]
 }
 ```
@@ -583,7 +583,7 @@ Body:
        {
           "category": "ACCESSORIES",
           "items":[]
-       },
+       }
    ]
 }
 ```
@@ -643,7 +643,7 @@ Body:
          "variantId": 4,
          "color": "red",
          "size": "XL",
-         "quantity": 0, // will be blurred in UI
+         "quantity": 0,
          "imageUrl": "https://....."
       }
    ]
@@ -680,3 +680,269 @@ Body:
 ## UC01.2  Filter Products
 
 ### REQUEST: 
+
+
+## UC04 Update Cart Item Quantity
+
+### REQUEST:
+
+**Header:** `X-Guest-Id`
+
+**Endpoint:** `PATCH /api/v1/cartItems/{cartItemId}`
+
+**Request Body**:
+```json
+{"quantity": 5}
+```
+
+**Path Parameter:** `cartItemId` - `int` - `required`
+
+**Query Parameter:** none
+
+
+### SUCCESS PATH:
+
+**1. Success Response:**
+Status: `200 Ok`
+Body:
+```json
+{
+   "status": 200,
+   "code": "CART_ITEM_QUANTITY_UPDATED",
+   "message": "Cart item [id=xxx] quantity updated successfully",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "data":{
+       "cartId": 12,
+       "items":[
+          {
+             "cartItemId": 1,
+             "variantId": 123,
+             "saleStatus": "ACTIVE",
+             "productName": "Bleach T-shirt",
+             "imageUrl": "https://anh-Bleach-T-shirt.jpg",
+             "color": "red",
+             "size": "M",
+             "unitPrice": "1500000",
+             "quantity": 2,
+             "availableQuantity":3,
+             "lineTotal":"3000000",
+             "availability": "AVAILABLE"
+          },
+          {
+             "cartItemId": 2,
+             "variantId": 134,
+             "saleStatus": "ACTIVE",
+             "productName": "Black Panther Pants",
+             "imageUrl": "https://anh-BlackPanther-Pants.jpg",
+             "color": "black",
+             "size": "L",
+             "unitPrice": "40000",
+             "quantity": 3,
+             "availableQuantity":3,
+             "lineTotal":"120000",
+             "availability": "AVAILABLE"
+          }
+       ],
+       "subTotal": 3120000,
+       "totalItems": 2,
+       "totalQuantity": 5
+   }
+}
+```
+
+**2. Success Response - new quantity = old quantity**:
+Status: `200 Ok`
+```json
+{
+   "status": 200,
+   "code": "CART_ITEM_UNCHANGED",
+   "message": "Cart item [id=xxx] quantity remains unchanged",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "data":{
+       "cartId": 12,
+       "items":[
+          {
+             "cartItemId": 1,
+             "variantId": 123,
+             "saleStatus": "ACTIVE",
+             "productName": "Bleach T-shirt",
+             "imageUrl": "https://anh-Bleach-T-shirt.jpg",
+             "color": "red",
+             "size": "M",
+             "unitPrice": "1500000",
+             "quantity": 2,
+             "availableQuantity":3,
+             "lineTotal":"3000000",
+             "availability": "AVAILABLE"
+          },
+          {
+             "cartItemId": 2,
+             "variantId": 134,
+             "saleStatus": "ACTIVE",
+             "productName": "Black Panther Pants",
+             "imageUrl": "https://anh-BlackPanther-Pants.jpg",
+             "color": "black",
+             "size": "L",
+             "unitPrice": "40000",
+             "quantity": 3,
+             "availableQuantity":3,
+             "lineTotal":"120000",
+             "availability": "AVAILABLE"
+          }
+       ],
+       "subTotal": 3120000,
+       "totalItems": 2,
+       "totalQuantity": 5
+   }
+}
+```
+
+
+### BAD PATH:
+
+**1. Error Response - cart not found:**
+Status: `404 Not Found`
+Body:
+```json
+{
+   "status": 404,
+   "code": "CART_NOT_FOUND",
+   "message": "Failed: Cart not found",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+**2. Error Response - cart item not found:**
+Status: `404 Not Found`
+Body:
+```json
+{
+   "status": 404,
+   "code": "CART_ITEM_NOT_FOUND",
+   "message": "Failed: Cart item [id=xxx] not found",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+**3. Error Response - new quantity is less than 1:**
+Status: `400 Bad Request`
+Body:
+```json
+{
+   "status": 400,
+   "code": "INVALID_QUANTITY",
+   "message": "Failed: New Quantity must not be less than one",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+**4. Error Response - new quantity exceeds the available stock:**
+Status: `409 Conflict`
+Body:
+```json
+{
+  "status": 409,
+  "code": "INSUFFICIENT_STOCK",
+  "message": "Failed: Stock quantity insufficient - [wantedQuantity=2] [availableQuantity=1]",
+  "timestamp": "2026-10-2T14:30:00+7:00"
+}
+```
+
+**5. Error Response - product - variant no longer available:**
+Status: `409 Conflict`
+Body:
+```json
+{
+   "status": 409,
+   "code": "PRODUCT_INACTIVE",
+   "message": "Failed: Product [id=xxx] no longer available",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+```json
+{
+   "status": 409,
+   "code": "INSUFFICIENT_STOCK",
+   "message": "Failed: Stock quantity insufficient - [wantedQuantity=x] [availableQuantity=0]",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+
+
+## UC05 Remove Item from Cart
+
+### REQUEST:
+
+**Header**: `X-Guest-Id`
+
+**Endpoint:** `DELETE /api/v1/cartItems/{cartItemId}`
+
+**Path Parameters:** `cartItemId` - `Long` - `Required`
+
+**Request Body:** none
+
+**Query parameters:** none
+
+
+### SUCCESS PATH:
+
+**1. Success Response:**
+Endpoint example: `DELETE /api/v1/cartItems/134`
+Status: `204 No Content`
+Body:
+```json
+{
+   "status": 204,
+   "code": "CART_ITEM_DELETED",
+   "message": "Cart item [id=xxx] is deleted successfully",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "data":{
+       "cartId": 12,
+       "items":[
+          {
+             "cartItemId": 1,
+             "variantId": 123,
+             "saleStatus": "ACTIVE",
+             "productName": "Bleach T-shirt",
+             "imageUrl": "https://anh-Bleach-T-shirt.jpg",
+             "color": "red",
+             "size": "M",
+             "unitPrice": "1500000",
+             "quantity": 2,
+             "availableQuantity":3,
+             "lineTotal":"3000000",
+             "availability": "AVAILABLE"
+          }
+       ],
+       "subTotal": "3000000",
+       "totalItems": 1,
+       "totalQuantity": 2
+   }
+}
+```
+
+### BAD PATH::
+
+**1. Error Response - Cart or Cart Item not found:**
+Status: `404 Not Found`
+Body:
+```json
+{
+   "status": 404,
+   "code": "CART_NOT_FOUND",
+   "message": "Failed: Cart not found",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+```json
+{
+   "status": 404,
+   "code": "CART_ITEM_NOT_FOUND",
+   "message": "Failed: Cart item [id=xxx] not found",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
