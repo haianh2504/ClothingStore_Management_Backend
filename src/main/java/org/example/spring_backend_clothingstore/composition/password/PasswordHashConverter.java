@@ -1,4 +1,4 @@
-package org.example.spring_backend_clothingstore.password;
+package org.example.spring_backend_clothingstore.composition.password;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

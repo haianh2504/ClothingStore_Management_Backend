@@ -9,8 +9,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.example.spring_backend_clothingstore.password.PasswordHash;
-import org.example.spring_backend_clothingstore.password.PasswordHashConverter;
+import org.example.spring_backend_clothingstore.composition.password.PasswordHash;
+import org.example.spring_backend_clothingstore.composition.password.PasswordHashConverter;
 
 @Entity
 @Table(name = "admin")
@@ -26,4 +26,10 @@ public class Admin {
     @Convert(converter = PasswordHashConverter.class)
     @Column(name = "password_hash", nullable = false, length = 255)
     private PasswordHash passwordHash;
+
+    // constructor for initializer
+    public Admin(String email, PasswordHash passwordHash) {
+        this.email = email;
+        this.passwordHash = passwordHash;
+    }
 }

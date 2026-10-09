@@ -12,6 +12,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -57,11 +59,13 @@ public class OrderItem {
     private ProductSize size;
 
     @Column(name = "quantity", nullable = false)
+    @Min(1)
     private Integer quantity;
 
     @Column(name = "color", nullable = false, length = 50)
     private String color;
 
     @Column(name = "unit_price", nullable = false, precision = 19, scale = 2)
+    @DecimalMin(value = "0.00")
     private BigDecimal unitPrice;
 }

@@ -6,11 +6,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.spring_backend_clothingstore.cart_item.entity.CartItem;
+import org.example.spring_backend_clothingstore.order_item.entity.OrderItem;
 import org.example.spring_backend_clothingstore.product.entity.Product;
-import org.example.spring_backend_clothingstore.product.entity.product_enum.SaleStatus;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -28,7 +30,10 @@ public class ProductVariant {
     private Product product;
 
     @OneToMany(mappedBy = "variant")
-    private List<ProductVariant> variants;
+    private List<CartItem> cartItems = new ArrayList<>();
+
+    @OneToMany(mappedBy = "variant")
+    private List<OrderItem> orderItems = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)

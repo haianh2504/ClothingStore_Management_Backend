@@ -1,22 +1,22 @@
 package org.example.spring_backend_clothingstore.order.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Email;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.spring_backend_clothingstore.composition.phone_number.PhoneNumber;
+import org.example.spring_backend_clothingstore.composition.customer_name.CustomerName;
+import org.example.spring_backend_clothingstore.composition.customer_name.CustomerNameConverter;
 import org.example.spring_backend_clothingstore.order_item.entity.OrderItem;
+import org.example.spring_backend_clothingstore.composition.phone_number.PhoneNumberConverter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -32,13 +32,16 @@ public class Order {
     @Column(name = "order_code", nullable = false, length = 250)
     private String orderCode;
 
+    @Convert(converter = CustomerNameConverter.class)
     @Column(name = "customer_name", nullable = false, length = 255)
-    private String customerName;
+    private CustomerName customerName;
 
+    @Convert(converter = PhoneNumberConverter.class)
     @Column(name = "phone_number", nullable = false, length = 50)
-    private String phoneNumber;
+    private PhoneNumber phoneNumber;
 
     @Column(name = "email", length = 250)
+    @Email
     private String email;
 
     @Column(name = "delivery_address", nullable = false, length = 255)

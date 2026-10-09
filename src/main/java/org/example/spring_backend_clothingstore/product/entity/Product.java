@@ -45,7 +45,7 @@ public class Product {
     @Column(name = "sale_status", nullable = false)
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    private SaleStatus saleStatus;
+    private SaleStatus saleStatus = SaleStatus.INACTIVE;
 
     @Column(name = "price", nullable = false, precision = 19, scale = 2)
     @DecimalMin(value = "0.00")

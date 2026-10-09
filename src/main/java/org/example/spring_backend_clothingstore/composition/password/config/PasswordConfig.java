@@ -1,4 +1,4 @@
-package org.example.spring_backend_clothingstore.password.config;
+package org.example.spring_backend_clothingstore.composition.password.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
