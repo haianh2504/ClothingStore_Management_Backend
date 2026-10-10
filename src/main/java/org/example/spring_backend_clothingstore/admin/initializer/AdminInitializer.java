@@ -27,7 +27,6 @@ public class AdminInitializer implements CommandLineRunner {
         if (adminRepository.count() > 0) {
             return;
         }
-
         adminRepository.save(new Admin(email, passwordHasher.hash(rawPassword)));
     }
 }
