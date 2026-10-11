@@ -491,7 +491,13 @@ Body:
 
 **Request Body:** none
 
-**Request Parameters:** none
+**Request Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+| :-------- | :--- | :------- | :------ | :---------- |
+| `page` | integer | No | `0` | Zero-based page number |
+| `size` | integer | No | `20` | Number of products per page; maximum `100` |
+| `sort` | string | No | Spring default | Sorting expression, for example `id,asc` |
 
 **Path Parameters**: none
 
@@ -506,7 +512,8 @@ Body:
    "code": "PRODUCT_RETRIEVED_SUCCESSFULLY",
    "message": "Product retrieving successfully",
    "timestamp": "2026-10-02T14:30:00+07:00",
-   "data":[
+   "data": {
+     "categories":[
        {
           "category": "TOPS",
           "items":[
@@ -558,7 +565,16 @@ Body:
              }
           ]
        }
-   ]
+     ],
+     "pagination": {
+        "page": 0,
+        "size": 20,
+        "totalElements": 6,
+        "totalPages": 1,
+        "first": true,
+        "last": true
+     }
+   }
 }
 ```
 
@@ -571,7 +587,8 @@ Body:
    "code": "PRODUCT_RETRIEVED_SUCCESSFULLY",
    "message": "Product retrieving successfully",
    "timestamp": "2026-10-02T14:30:00+07:00",
-   "data":[
+   "data": {
+     "categories":[
        {
           "category": "TOPS",
           "items":[]
@@ -584,7 +601,16 @@ Body:
           "category": "ACCESSORIES",
           "items":[]
        }
-   ]
+     ],
+     "pagination": {
+        "page": 0,
+        "size": 20,
+        "totalElements": 0,
+        "totalPages": 0,
+        "first": true,
+        "last": true
+     }
+   }
 }
 ```
 
@@ -945,4 +971,3 @@ Body:
    "timestamp": "2026-10-02T14:30:00+07:00"
 }
 ```
-
