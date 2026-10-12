@@ -1,4 +1,4 @@
-package org.example.spring_backend_clothingstore.product.dto.response;
+package org.example.spring_backend_clothingstore.api_response_schema;
 
 import org.springframework.data.domain.Page;
 

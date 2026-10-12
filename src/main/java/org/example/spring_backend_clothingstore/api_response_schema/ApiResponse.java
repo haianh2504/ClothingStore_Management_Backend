@@ -1,4 +1,4 @@
-package org.example.spring_backend_clothingstore.product.dto;
+package org.example.spring_backend_clothingstore.api_response_schema;
 
 import java.time.OffsetDateTime;
 
