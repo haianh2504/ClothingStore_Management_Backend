@@ -1,5 +1,6 @@
 package org.example.spring_backend_clothingstore.product.dto.response;
 
+import org.example.spring_backend_clothingstore.api_response_schema.PageMetadata;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 package org.example.spring_backend_clothingstore.product.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.spring_backend_clothingstore.product.dto.ApiResponse;
+import org.example.spring_backend_clothingstore.api_response_schema.ApiResponse;
 import org.example.spring_backend_clothingstore.product.dto.response.ProductPageResponse;
 import org.example.spring_backend_clothingstore.product.service.ProductService;
 import org.springframework.data.domain.Pageable;
