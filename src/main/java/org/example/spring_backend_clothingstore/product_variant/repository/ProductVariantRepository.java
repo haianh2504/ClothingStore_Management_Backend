@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductVariantRepository extends JpaRepository<ProductVariant, Long> {
+
     // Find all variants of a productId and sale status
     @EntityGraph(attributePaths = "product")
     Page<ProductVariant> findAllByProduct_IdAndProduct_SaleStatus(
@@ -17,4 +18,5 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             SaleStatus saleStatus,
             Pageable pageable
     );
+
 }
