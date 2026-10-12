@@ -624,7 +624,13 @@ Body:
 
 **Request Body:** none
 
-**Request Parameters:** none
+**Request Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+| :-------- | :--- | :------- | :------ | :---------- |
+| `page` | integer | No | `0` | Zero-based page number |
+| `size` | integer | No | `20` | Number of variants per page; maximum `100` |
+| `sort` | string | No | Spring default | Sorting expression, for example `id,asc` |
 
 **Path Parameters**:
 
@@ -643,36 +649,36 @@ Body:
    "code": "PRODUCT_VARIANT_RETRIEVED_SUCCESSFULLY",
    "message": "Product's Variants retrieving successfully",
    "timestamp": "2026-10-02T14:30:00+07:00",
-   "items":[
-      {
-         "variantId": 1,
-         "color": "red",
-         "size": "M",
-         "quantity": 5,
-         "imageUrl": "https://....."
-      },
-      {
-         "variantId": 2,
-         "color": "blue",
-         "size": "XL",
-         "quantity": 4,
-         "imageUrl": "https://....."
-      },
-      {
-         "variantId": 3,
-         "color": "blue",
-         "size": "M",
-         "quantity": 6,
-         "imageUrl": "https://....."
-      },
-      {
-         "variantId": 4,
-         "color": "red",
-         "size": "XL",
-         "quantity": 0,
-         "imageUrl": "https://....."
+   "data": {
+      "productName": "T-Shirt",
+      "description": ".............",
+      "category": "TOPS",
+      "price": 30000,
+      "items":[
+         {
+            "variantId": 1,
+            "color": "red",
+            "size": "M",
+            "quantity": 5,
+            "imageUrl": "https://....."
+         },
+         {
+            "variantId": 2,
+            "color": "blue",
+            "size": "XL",
+            "quantity": 4,
+            "imageUrl": "https://....."
+         }
+      ],
+      "pagination": {
+         "page": 0,
+         "size": 20,
+         "totalElements": 4,
+         "totalPages": 1,
+         "first": true,
+         "last": true
       }
-   ]
+   }
 }
 ```
 
