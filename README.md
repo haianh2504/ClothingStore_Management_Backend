@@ -4,7 +4,7 @@ A small full-stack clothing store built to practice Spring Boot, JPA, Hibernate,
 
 ## Project Status
 
-Currently in the design phase
+Currently building the backend
 
 ## Planned Technology Stack
 
