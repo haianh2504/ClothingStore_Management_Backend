@@ -2,6 +2,7 @@ package org.example.spring_backend_clothingstore.product.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.spring_backend_clothingstore.product.dto.response.CategoryProductResponse;
+import org.example.spring_backend_clothingstore.product.dto.response.CategoryProductPageResponse;
 import org.example.spring_backend_clothingstore.product.dto.response.ProductPageResponse;
 import org.example.spring_backend_clothingstore.product.dto.response.ProductResponse;
 import org.example.spring_backend_clothingstore.product.entity.Product;
@@ -50,5 +51,18 @@ public class ProductServiceImpl implements ProductService {
                 .toList();
 
         return ProductPageResponse.from(categories, activeProducts);
+    }
+
+    // Find `ACTIVE` products of a specific category
+    @Override
+    public CategoryProductPageResponse findActiveProductsByCategory(
+            Pageable pageable,
+            ProductCategory category
+    ) {
+        Page<ProductResponse> products = productRepository
+                .findAllByCategoryAndSaleStatus(category, SaleStatus.ACTIVE, pageable)
+                .map(ProductResponse::from);
+
+        return CategoryProductPageResponse.from(category, products);
     }
 }
