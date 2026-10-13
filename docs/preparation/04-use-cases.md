@@ -5,7 +5,7 @@ Customer
 ├── Product
 │   ├── UC01 Browse All Products
 │   ├── UC01.1 Browse Product Variants
-│   └── UC01.2 Filter Products
+│   └── UC01.2 Browse Products by Category
 │
 ├── Cart / CartItem
 │   ├── UC02 Add Product Variant to Cart
@@ -84,17 +84,24 @@ Administrator
 
 ---
 
-## UC01.2  Filter Products
+## UC01.2 Browse Products by Category
 
 **Actor:** Customer
 
-**Preconditions:** None
+**Preconditions:** The product catalog is available.
 
-**Main flow:** temporarily unfinished
-
+**Main flow:**
+1. The customer selects a product category from the navigation or catalog filter.
+2. The client requests the product collection with the selected category as the `category` query parameter.
+3. The system validates that the category is supported.
+4. The system retrieves only `ACTIVE` products belonging to that category.
+5. The system applies the requested pagination and sorting options.
+6. The system returns the selected category, matching products, and pagination metadata.
 
 **Alternative flows:**
-
+- If the `category` query parameter is missing or blank, the system returns a `400 Bad Request` response.
+- If the category is not supported, the system returns a `400 Bad Request` response.
+- If no active products are available in the category, the system returns `200 OK` with an empty items list and zero matching elements.
 
 **Postconditions:**
 

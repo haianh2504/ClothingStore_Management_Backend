@@ -709,9 +709,115 @@ Body:
 
 
 
-## UC01.2  Filter Products
+## UC01.2 Browse Products by Category
 
-### REQUEST: 
+### REQUEST:
+
+Category is a collection filter, so it is represented as a query parameter on the product collection endpoint rather than as a separate resource path.
+
+**Endpoint:** `GET /api/v1/products?category=TOPS`
+
+**Request Body:** none
+
+**Request Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+| :-------- | :--- | :------- | :------ | :---------- |
+| `category` | string | Yes | none | Product category filter. Supported values: `TOPS`, `BOTTOMS`, `ACCESSORIES`; case-sensitive |
+| `page` | integer | No | `0` | Zero-based page number |
+| `size` | integer | No | `20` | Number of products per page; maximum `100` |
+| `sort` | string | No | Spring default | Sorting expression, for example `id,asc` |
+
+**Path Parameters:** none
+
+### SUCCESS PATH:
+
+**1. Success Response - matching `ACTIVE` products exist:**
+Status: `200 OK`
+Body:
+```json
+{
+   "status": 200,
+   "code": "PRODUCT_RETRIEVED_SUCCESSFULLY",
+   "message": "Product retrieving successfully",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "data": {
+      "category": "TOPS",
+      "items": [
+         {
+            "productId": 1,
+            "productName": "T-shirt 01",
+            "description": "......",
+            "unitPrice": "50000"
+         },
+         {
+            "productId": 2,
+            "productName": "Jacket 02",
+            "description": "......",
+            "unitPrice": "120000"
+         }
+      ],
+      "pagination": {
+         "page": 0,
+         "size": 20,
+         "totalElements": 2,
+         "totalPages": 1,
+         "first": true,
+         "last": true
+      }
+   }
+}
+```
+
+**2. Success Response - no matching `ACTIVE` products:**
+Status: `200 OK`
+Body:
+```json
+{
+   "status": 200,
+   "code": "PRODUCT_RETRIEVED_SUCCESSFULLY",
+   "message": "Product retrieving successfully",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "data": {
+      "category": "TOPS",
+      "items": [],
+      "pagination": {
+         "page": 0,
+         "size": 20,
+         "totalElements": 0,
+         "totalPages": 0,
+         "first": true,
+         "last": true
+      }
+   }
+}
+```
+
+### BAD PATH:
+
+**1. Error Response - missing category:**
+Status: `400 Bad Request`
+Body:
+```json
+{
+   "status": 400,
+   "code": "PRODUCT_CATEGORY_REQUIRED",
+   "message": "Query parameter 'category' is required",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+**2. Error Response - invalid category:**
+Status: `400 Bad Request`
+Body:
+```json
+{
+   "status": 400,
+   "code": "INVALID_PRODUCT_CATEGORY",
+   "message": "Failed: Unsupported product category [category=SHOES]",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
 
 
 ## UC04 Update Cart Item Quantity
