@@ -3,8 +3,8 @@
 ```mermaid  
 erDiagram  
     PRODUCT ||--o{ PRODUCT_VARIANT : has    CART ||--o{ CART_ITEM : contains    PRODUCT_VARIANT ||--o{ CART_ITEM : references    ORDER ||--|{ ORDER_ITEM : contains    PRODUCT_VARIANT ||--o{ ORDER_ITEM : references  
-    PRODUCT {        long id PK        string name        string description        ProductCategory category        decimal price        string saleStatus    }  
-    PRODUCT_VARIANT {        long id PK        long productId FK        string color        string size        int quantity        string imageUrl    }  
+    PRODUCT {        long id PK        string name        string description        ProductCategory category        decimal price        string saleStatus        datetime deletedAt    }
+    PRODUCT_VARIANT {        long id PK        long productId FK        string color        string size        int quantity        string imageUrl        datetime deletedAt    }
     ORDER {       string orderCode        string customerName        string phoneNumber        string email        string deliveryAddress        decimal totalPrice        string status        datetime createdAt    }  
     CART {        long id PK        string guestId    }  
     CART_ITEM {        long id PK        long cartId FK        long variantId FK        int quantity    }  

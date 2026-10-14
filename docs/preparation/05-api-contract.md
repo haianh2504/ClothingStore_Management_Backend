@@ -171,6 +171,8 @@ Body:
 
 **Header:** `X-Guest-Id`
 
+`unitPrice` and every `lineTotal` are calculated from the associated `Product.price`. Product variants do not have independent prices.
+
 **Endpoint:** `GET /api/v1/carts/items`
 
 **Request Body**: none
@@ -319,6 +321,8 @@ Body:
 ### REQUESTS:
 
 **Header:** `X-Guest-Id`
+
+`unitPrice` and every `lineTotal` are calculated from the associated `Product.price`. Product variants do not have independent prices.
 
 **Endpoint**: `POST /api/v1/orders`
 
@@ -826,6 +830,8 @@ Body:
 
 **Header:** `X-Guest-Id`
 
+`unitPrice` and every `lineTotal` are calculated from the associated `Product.price`. Product variants do not have independent prices.
+
 **Endpoint:** `PATCH /api/v1/cartItems/{cartItemId}`
 
 **Request Body**:
@@ -1014,6 +1020,8 @@ Body:
 ### REQUEST:
 
 **Header**: `X-Guest-Id`
+
+`unitPrice` and every `lineTotal` are calculated from the associated `Product.price`. Product variants do not have independent prices.
 
 **Endpoint:** `DELETE /api/v1/cartItems/{cartItemId}`
 

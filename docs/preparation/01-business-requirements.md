@@ -7,7 +7,7 @@ The project is intended for learning CRUD operations, Spring Boot, JPA, Hiber
 ## 2. Administrator
 
 - Can create, view, update, and hide products, including their name, description, category, price, image, sizes, stock quantity, and sale status.
-- Can add / remove / update a specific product
+- Can add / update products and product variants. Product and variant removal uses soft-delete so historical order data is preserved.
 - Can cancel specific orders which not allowed or invalid
 - Can view an order list and order details
 - Can update an order's status according to the allowed transitions
@@ -29,12 +29,17 @@ The project is intended for learning CRUD operations, Spring Boot, JPA, Hiber
 - An order lookup succeeds only when both the order code and the checkout phone number match.
 - Demo orders do not collect payment and do not represent a real delivery process.
 - Order records and their item details are not hard-deleted.
+- Product price is stored on `Product`, not on `ProductVariant`. Every variant of the same product uses the product's current price.
+- When an order is created, the product price is copied into `OrderItem.unitPrice` as a historical snapshot.
 ### 4.1 Product Business Rules
 
 - Product's name must be unique
 - Product prices and stock quantities cannot be negative.
 - A product must has a `name`, its `category` and `sale_status` is `INACTIVE` when it was first created.
 - To `Activate` an `INACTIVE` product, make sure its details `are fully filled in`, and that product must have 1 `variant` with valid info.
+- A soft-deleted product is not displayed, cannot be activated, and cannot be used in a new cart or order.
+- Soft-deleting a product also soft-deletes its variants. The product and variants remain stored for historical references.
+- A soft-deleted variant is not displayed or available for new carts and orders.
 
 ## 5. Order Placement Flow
 
@@ -54,13 +59,20 @@ The administrator may cancel a `PENDING` or `CONFIRMED` order. The system c
 
 The system must prevent a cancelled order from restoring inventory more than once.
 
-## 7. Out of Scope for the MVP
+## 7. Administrator Authentication
+
+- Administrator authentication uses a server-side session.
+- The client receives an opaque session cookie after successful login.
+- Protected administrator endpoints require a valid authenticated session.
+- Logout invalidates the session.
+- Product and variant soft-delete does not remove historical order records or order-item snapshots.
+
+## 8. Out of Scope for the MVP
 
 - Real online payment or money handling.
 - Shipping provider integration or shipment tracking.
 - Customer registration and login.
 - Coupons, product reviews, refunds, and returns.
 - Automated email or SMS notifications.
-
 
 

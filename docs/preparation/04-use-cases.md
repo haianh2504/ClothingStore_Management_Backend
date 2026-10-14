@@ -267,11 +267,11 @@ Administrator
 6. The system validates the customer information.
 7. The system verifies that every product is active.
 8. The system verifies that every product variant exists and has sufficient stock.
-9. The system retrieves current product prices from the database.
+9. The system retrieves the current `Product.price` for each cart item's product.
 10. The system calculates the total price.
 11. The system creates an order with the `PENDING` status.
 12. The system creates an order item for each cart item.
-13. The system stores the product name, size, color, quantity, and unit price in each order item.
+13. The system stores the product name, size, color, quantity, and the `Product.price` snapshot as `unitPrice` in each order item.
 14. The system decreases the stock quantity of each ordered product variant.
 15. The system clears the cart.
 16. The system commits the transaction.
@@ -340,8 +340,8 @@ Administrator
 3. The frontend sends the credentials to the system.
 4. The system finds the administrator account by email.
 5. The system verifies the submitted password against the stored password hash.
-6. The system creates an authenticated session or authentication token.
-7. The system returns a successful authentication response.
+6. The system creates an authenticated server-side session.
+7. The system returns a successful authentication response and sets an opaque session cookie.
 8. The frontend redirects the administrator to the management page.
 
 **Alternative flows:**
@@ -446,7 +446,7 @@ Administrator
 - If the product does not exist, the system returns a not found response.
 - If required variant information is missing or invalid, the system returns validation errors.
 - If the stock quantity is negative, the system rejects the request.
-- If the variant price is negative, the system rejects the request.
+- The variant uses the price stored on its associated product; no separate variant price is submitted or validated.
 - If another variant with the same color and size already exists for the product, the system rejects the duplicate.
 - If image upload fails, the variant creation operation fails and no incomplete variant is retained.
 
@@ -486,7 +486,7 @@ Administrator
 - If the variant does not exist or does not belong to the selected product, the system returns a not found response.
 - If the submitted data is invalid, the system rejects the request.
 - If the stock quantity is negative, the system rejects the request.
-- If the variant price is negative, the system rejects the request.
+- The variant uses the price stored on its associated product; no separate variant price is submitted or validated.
 - If the update would create a duplicate color and size combination, the system rejects the request.
 - If image upload fails, the system keeps the previous image information and rejects the image change.
 
@@ -514,7 +514,7 @@ Administrator
 3. The administrator selects **Remove Variant**.
 4. The frontend sends the removal request to the system.
 5. The system verifies that the product variant exists and belongs to the selected product.
-6. The system removes or deactivates the selected product variant according to the system's persistence policy.
+6. The system soft-deletes the selected product variant by recording its deletion state.
 7. The system returns a successful response.
 8. The frontend removes the variant from the active variant list and displays a successful removal message.
 
@@ -522,11 +522,12 @@ Administrator
 
 - If the product does not exist, the system returns a not found response.
 - If the variant does not exist or does not belong to the selected product, the system returns a not found response.
-- If the variant cannot be physically deleted because it is referenced by historical order data, the system preserves historical references and makes the variant unavailable for future purchases.
+- The system does not physically delete the variant. Historical order references remain intact while the variant becomes unavailable for future purchases.
 
 **Postconditions:**
 
 - The selected variant is no longer available for new purchases.
+- The selected variant remains stored for historical order references.
 - Existing order item snapshots remain unchanged.
 
 ---
@@ -561,6 +562,7 @@ Administrator
 - An `ACTIVE` product can appear in the storefront.
 - An `INACTIVE` product is hidden from the storefront and cannot be included in a new order.
 - Existing orders containing the product remain unchanged.
+- If the product is soft-deleted, the system also soft-deletes its variants and retains both records for historical references.
 
 ---
 
