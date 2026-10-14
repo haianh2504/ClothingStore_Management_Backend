@@ -30,4 +30,10 @@ public class CartItem {
     @Min(1)
     @Column(name = "quantity",nullable = false)
     private int quantity;
+
+    public CartItem(Cart cart, ProductVariant variant, int quantity) {
+        this.cart = cart;
+        this.variant = variant;
+        this.quantity = quantity;
+    }
 }

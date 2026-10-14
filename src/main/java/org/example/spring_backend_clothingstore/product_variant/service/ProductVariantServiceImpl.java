@@ -3,6 +3,7 @@ package org.example.spring_backend_clothingstore.product_variant.service;
 import lombok.RequiredArgsConstructor;
 import org.example.spring_backend_clothingstore.exception.business.ProductInactiveException;
 import org.example.spring_backend_clothingstore.exception.resource.ProductNotFoundException;
+import org.example.spring_backend_clothingstore.exception.resource.ProductVariantNotFoundException;
 import org.example.spring_backend_clothingstore.product.entity.product_enum.SaleStatus;
 import org.example.spring_backend_clothingstore.product.entity.Product;
 import org.example.spring_backend_clothingstore.product.repository.ProductRepository;
@@ -21,6 +22,13 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     private final ProductVariantRepository productVariantRepository;
     private final ProductRepository productRepository;
 
+    // GET BY ID
+    @Override
+    public ProductVariant getProductVariantById(Long id)
+    {
+        return productVariantRepository.findById(id)
+                .orElseThrow(() -> new ProductVariantNotFoundException(id));
+    };
     // GET VARIANTS OF A PRODUCT
     @Override
     public ProductVariantResponse getProductVariantsByProductId(
