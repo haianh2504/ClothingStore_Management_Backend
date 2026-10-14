@@ -6,6 +6,7 @@ import org.example.spring_backend_clothingstore.product_variant.dto.ProductVaria
 import org.example.spring_backend_clothingstore.product_variant.service.ProductVariantService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +22,7 @@ public class ProductVariantController {
 
     // GET all ACTIVE variants of an ACTIVE product
     @GetMapping
-    public ApiResponse<ProductVariantResponse> getProductVariantsByProductId(
+    public ResponseEntity<ApiResponse<ProductVariantResponse>> getProductVariantsByProductId(
             @PathVariable Long productId,
             Pageable pageable
     ) {
@@ -30,12 +31,12 @@ public class ProductVariantController {
                 pageable
         );
 
-        return ApiResponse.from(
+        return ResponseEntity.ok(ApiResponse.from(
                 HttpStatus.OK.value(),
                 "PRODUCT_VARIANT_RETRIEVED_SUCCESSFULLY",
                 "Product's Variants retrieving successfully",
                 OffsetDateTime.now(),
                 data
-        );
+        ));
     }
 }

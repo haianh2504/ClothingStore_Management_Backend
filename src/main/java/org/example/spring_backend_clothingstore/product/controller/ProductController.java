@@ -9,6 +9,7 @@ import org.example.spring_backend_clothingstore.product.dto.response.ProductPage
 import org.example.spring_backend_clothingstore.product.entity.product_enum.ProductCategory;
 import org.example.spring_backend_clothingstore.product.service.ProductService;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,20 +25,20 @@ public class ProductController {
 
     // GET `ACTIVE` PRODUCTS AS DEFAULT
     @GetMapping(params = "!category")
-    public ApiResponse<ProductPageResponse> getProducts(Pageable pageable) {
+    public ResponseEntity<ApiResponse<ProductPageResponse>> getProducts(Pageable pageable) {
         ProductPageResponse products = productService.findActiveProducts(pageable);
-        return ApiResponse.from(
+        return ResponseEntity.ok(ApiResponse.from(
                 200,
                 "PRODUCT_RETRIEVED_SUCCESSFULLY",
                 "Product retrieving successfully",
                 OffsetDateTime.now(),
                 products
-        );
+        ));
     }
 
     // GET `ACTIVE` products by category
     @GetMapping(params = "category")
-    public ApiResponse<CategoryProductPageResponse> getProductsByCategory(
+    public ResponseEntity<ApiResponse<CategoryProductPageResponse>> getProductsByCategory(
             @RequestParam(name = "category") String category,
             Pageable pageable
     ){
@@ -47,13 +48,13 @@ public class ProductController {
                 productCategory
         );
 
-        return ApiResponse.from(
+        return ResponseEntity.ok(ApiResponse.from(
                 200,
                 "PRODUCT_RETRIEVED_SUCCESSFULLY",
                 "Product retrieving successfully",
                 OffsetDateTime.now(),
                 products
-        );
+        ));
     }
 
     private ProductCategory parseCategory(String category) {
