@@ -16,8 +16,11 @@ CREATE TABLE products(
                          description VARCHAR(255) NOT NULL,
                          category product_category_enum NOT NULL,
                          price DECIMAL(19,2) NOT NULL CHECK (price >= 0),
-                         sale_status sale_status_enum DEFAULT 'INACTIVE'
+                         sale_status sale_status_enum NOT NULL DEFAULT 'INACTIVE'
 );
+
+ALTER TABLE products
+    ADD COLUMN deleted_at TIMESTAMPTZ;
 
 CREATE TABLE product_variants(
                                  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY ,
@@ -27,6 +30,13 @@ CREATE TABLE product_variants(
                                  image_url VARCHAR(250) NOT NULL,
                                  color VARCHAR(50) NOT NULL
 );
+
+ALTER TABLE product_variants
+    ADD COLUMN deleted_at TIMESTAMPTZ;
+
+CREATE UNIQUE INDEX uq_active_product_variant_attributes
+    ON product_variants (product_id, size, color)
+    WHERE deleted_at IS NULL;
 
 ALTER TABLE product_variants
     ADD CONSTRAINT fk_variant_product
@@ -86,4 +96,3 @@ ALTER TABLE order_items
 ALTER TABLE order_items
     ADD CONSTRAINT uq_order_item_variant
         UNIQUE (variant_id,order_code);
-
