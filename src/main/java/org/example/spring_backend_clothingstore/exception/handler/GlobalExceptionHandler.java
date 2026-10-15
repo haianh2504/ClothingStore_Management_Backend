@@ -12,6 +12,9 @@ import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import java.util.List;
+import java.util.Map;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -23,6 +26,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(status)
                 .body(ErrorResponse.from(status.value(), code, exception.getMessage()));
+    }
+
+    @ExceptionHandler(org.example.spring_backend_clothingstore.exception.business.ProductUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleProductUnavailable(
+            org.example.spring_backend_clothingstore.exception.business.ProductUnavailableException exception
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ErrorResponse.from(
+                        HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                        exception.getCode(),
+                        exception.getMessage(),
+                        exception.getErrors()
+                ));
     }
 
     @ExceptionHandler(MissingRequestHeaderException.class)
@@ -46,16 +63,23 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(
             MethodArgumentNotValidException exception
     ) {
-        String message = exception.getBindingResult()
+        List<Map<String, String>> errors = exception.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .findFirst()
-                .map(error -> error.getDefaultMessage())
-                .orElse("Failed: Invalid details provided");
+                .map(error -> Map.of(
+                        "field", error.getField(),
+                        "message", error.getDefaultMessage()
+                ))
+                .toList();
 
         return ResponseEntity
                 .badRequest()
-                .body(ErrorResponse.from(400, "INVALID_INFORMATION_PROVIDED", message));
+                .body(ErrorResponse.from(
+                        400,
+                        "INVALID_INFORMATION_PROVIDED",
+                        "Failed: Invalid details provided",
+                        errors
+                ));
     }
 
     @ExceptionHandler(ResponseStatusException.class)
