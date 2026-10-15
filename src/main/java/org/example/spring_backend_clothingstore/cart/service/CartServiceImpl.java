@@ -17,6 +17,8 @@ import org.example.spring_backend_clothingstore.product_variant.entity.ProductVa
 import org.example.spring_backend_clothingstore.product_variant.repository.ProductVariantRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Pageable;
+import java.util.Objects;
 
 import java.util.Optional;
 
@@ -84,10 +86,34 @@ public class CartServiceImpl implements CartService {
     }
 
     private CartResponse toCartResponse(Cart cart) {
-        var items = cartItemRepository.findAllByCart_Id(cart.getId()).stream()
-                .map(CartResponse.CartItemResponse::from)
-                .toList();
+        return CartResponse.from(
+                cart.getId(),
+                cartItemRepository.findAllByCart_Id(
+                        cart.getId(),
+                        org.springframework.data.domain.Pageable.unpaged()
+                )
+        );
+    }
 
-        return CartResponse.from(cart.getId(), items);
+    @Transactional(readOnly = true)
+    @Override
+    public CartResponse getCartByGuestId(String guestId, Pageable pageable) {
+        validateGuestId(guestId);
+        Objects.requireNonNull(pageable, "pageable cannot be null");
+
+        return cartRepository.findByGuestId(guestId)
+                .map(cart -> {
+                    var items = cartItemRepository.findAllByCart_Id(cart.getId(), pageable);
+                    return CartResponse.from(
+                            cart.getId(),
+                            items,
+                            cartItemRepository.countByCart_Id(cart.getId()),
+                            cartItemRepository.sumQuantityByCartId(cart.getId()),
+                            cartItemRepository.sumSubtotalByCartId(cart.getId())
+                    );
+                })
+                .orElseGet(() -> CartResponse.empty(
+                        org.springframework.data.domain.Page.empty(pageable)
+                ));
     }
 }

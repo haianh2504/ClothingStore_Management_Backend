@@ -9,11 +9,8 @@ import org.example.spring_backend_clothingstore.cart.service.AddCartItemResult;
 import org.example.spring_backend_clothingstore.cart.service.CartService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.OffsetDateTime;
 
@@ -47,6 +44,25 @@ public class CartController {
                 message,
                 OffsetDateTime.now(),
                 result.cart()
+        ));
+    }
+
+    // VIEW CART
+    @GetMapping("/items")
+    public ResponseEntity<ApiResponse<CartResponse>> getCartByGuestId(
+            @RequestHeader("X-Guest-Id") String guestId,
+            Pageable pageable
+    ) {
+        CartResponse cart = cartService.getCartByGuestId(guestId, pageable);
+        boolean empty = cart.items().isEmpty();
+        int status = HttpStatus.OK.value();
+
+        return ResponseEntity.ok(ApiResponse.from(
+                status,
+                empty ? "CART_EMPTY" : "OK",
+                empty ? "Empty cart" : "Get cart with items successfully",
+                OffsetDateTime.now(),
+                cart
         ));
     }
 }
