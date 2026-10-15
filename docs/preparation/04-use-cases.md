@@ -266,7 +266,7 @@ Administrator
 5. The system retrieves the cart and its items.
 6. The system validates the customer information.
 7. The system verifies that every product is active.
-8. The system verifies that every product variant exists and has sufficient stock.
+8. The system verifies that every product variant exists, is not soft-deleted, and has sufficient stock.
 9. The system retrieves the current `Product.price` for each cart item's product.
 10. The system calculates the total price.
 11. The system creates an order with the `PENDING` status.
@@ -282,7 +282,7 @@ Administrator
 
 - If the cart is empty or does not exist, the system rejects the request.
 - If the customer information is invalid, the system returns validation errors.
-- If a product is inactive or unavailable, the system rejects the order.
+- If a product is inactive, a product variant is soft-deleted, or either is unavailable, the system rejects the order.
 - If any variant has insufficient stock, the system rejects the order and reports the affected item.
 - If any operation fails while creating the order, creating order items, decreasing stock, or clearing the cart, the system rolls back the entire transaction.
 

@@ -45,7 +45,8 @@ public class CartServiceImpl implements CartService {
         ProductVariant variant = productVariantRepository.findById(variantId)
                 .orElseThrow(() -> new ProductVariantNotFoundException(variantId));
 
-        if (variant.getProduct().getSaleStatus() != SaleStatus.ACTIVE) {
+        if (variant.getProduct().getSaleStatus() != SaleStatus.ACTIVE
+                || variant.getDeletedAt() != null) {
             throw new ProductInactiveForCartException(variantId);
         }
 

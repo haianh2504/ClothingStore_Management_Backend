@@ -14,6 +14,7 @@ import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "product_variants")
@@ -49,4 +50,7 @@ public class ProductVariant {
 
     @Column(name = "image_url", nullable = false, length = 250)
     private String imageUrl;
+
+    @Column(name = "deleted_at")
+    private OffsetDateTime deletedAt;
 }

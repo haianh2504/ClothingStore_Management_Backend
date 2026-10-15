@@ -41,7 +41,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
         Objects.requireNonNull(pageable,"pageable cannot be null");
 
-        Page<ProductVariant> variants = productVariantRepository.findAllByProduct_IdAndProduct_SaleStatus(
+        Page<ProductVariant> variants = productVariantRepository.findAllByProduct_IdAndProduct_SaleStatusAndDeletedAtIsNull(
                 productId,
                 SaleStatus.ACTIVE,
                 pageable

@@ -62,4 +62,21 @@ public class Order {
 
     @OneToMany(mappedBy = "order")
     private List<OrderItem> items = new ArrayList<>();
+
+    public Order(
+            String orderCode,
+            CustomerName customerName,
+            PhoneNumber phoneNumber,
+            String email,
+            String deliveryAddress,
+            BigDecimal totalPrice
+    ) {
+        this.orderCode = orderCode;
+        this.customerName = customerName;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.deliveryAddress = deliveryAddress;
+        this.totalPrice = totalPrice;
+        this.status = OrderStatus.PENDING;
+    }
 }

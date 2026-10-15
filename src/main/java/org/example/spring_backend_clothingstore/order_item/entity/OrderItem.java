@@ -68,4 +68,22 @@ public class OrderItem {
     @Column(name = "unit_price", nullable = false, precision = 19, scale = 2)
     @DecimalMin(value = "0.00")
     private BigDecimal unitPrice;
+
+    public OrderItem(
+            Order order,
+            ProductVariant variant,
+            String productName,
+            ProductSize size,
+            int quantity,
+            String color,
+            BigDecimal unitPrice
+    ) {
+        this.order = order;
+        this.variant = variant;
+        this.productName = productName;
+        this.size = size;
+        this.quantity = quantity;
+        this.color = color;
+        this.unitPrice = unitPrice;
+    }
 }

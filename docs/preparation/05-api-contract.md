@@ -446,7 +446,7 @@ Body:
 }
 ```
 
-**4. Error Response - a product is inactive or unavailable or has insufficient stock:**
+**4. Error Response - a product or variant is unavailable, inactive, soft-deleted, or has insufficient stock:**
 Status: `422 Unprocessable Entity`
 Body:
 ```json
@@ -459,6 +459,10 @@ Body:
       {
          "variantId": 132,
          "availability": "PRODUCT_INACTIVE"
+      },
+      {
+         "variantId": 125,
+         "availability": "VARIANT_DELETED"
       },
       {
          "variantId": 124,
