@@ -173,7 +173,7 @@ Body:
 
 `unitPrice` and every `lineTotal` are calculated from the associated `Product.price`. Product variants do not have independent prices.
 
-**Endpoint:** `GET /api/v1/carts/items`
+**Endpoint:** `GET /api/v1/carts`
 
 **Request Body**: none
 
