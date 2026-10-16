@@ -1040,11 +1040,11 @@ Body:
 
 **1. Success Response:**
 Endpoint example: `DELETE /api/v1/cartItems/134`
-Status: `204 No Content`
+Status: `200 OK`
 Body:
 ```json
 {
-   "status": 204,
+   "status": 200,
    "code": "CART_ITEM_DELETED",
    "message": "Cart item [id=xxx] is deleted successfully",
    "timestamp": "2026-10-02T14:30:00+07:00",

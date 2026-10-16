@@ -96,4 +96,21 @@ public class CartController {
                 result.cart()
         ));
     }
+
+    @DeleteMapping("/cartItems/{cartItemId}")
+    public ResponseEntity<ApiResponse<CartResponse>> removeCartItem(
+            @RequestHeader("X-Guest-Id") String guestId,
+            @PathVariable Long cartItemId
+    ) {
+        CartResponse cart = cartService.removeCartItem(guestId, cartItemId);
+        int status = HttpStatus.OK.value();
+
+        return ResponseEntity.ok(ApiResponse.from(
+                status,
+                "CART_ITEM_DELETED",
+                "Cart item [id=" + cartItemId + "] is deleted successfully",
+                OffsetDateTime.now(),
+                cart
+        ));
+    }
 }

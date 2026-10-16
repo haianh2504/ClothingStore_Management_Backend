@@ -98,6 +98,7 @@ public class CartServiceImpl implements CartService {
         );
     }
 
+    // GET CART BY GUEST ID
     @Transactional(readOnly = true)
     @Override
     public CartResponse getCartByGuestId(String guestId, Pageable pageable) {
@@ -160,5 +161,27 @@ public class CartServiceImpl implements CartService {
         }
 
         return new UpdateCartItemResult(toCartResponse(cart), unchanged);
+    }
+
+    // REMOVE CART ITEM
+    @Transactional
+    @Override
+    public CartResponse removeCartItem(String guestId, Long cartItemId) {
+        validateGuestId(guestId);
+
+        if (cartItemId == null || cartItemId <= 0) {
+            throw new CartItemNotFoundException(cartItemId);
+        }
+
+        Cart cart = cartRepository.findByGuestId(guestId)
+                .orElseThrow(CartNotFoundException::new);
+
+        CartItem cartItem = cartItemRepository.findByIdAndCart_Id(cartItemId, cart.getId())
+                .orElseThrow(() -> new CartItemNotFoundException(cartItemId));
+
+        cartItemRepository.delete(cartItem);
+        cartItemRepository.flush();
+
+        return toCartResponse(cart);
     }
 }
