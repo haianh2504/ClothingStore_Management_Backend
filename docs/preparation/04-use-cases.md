@@ -37,7 +37,7 @@ Administrator
     └── UC17 Cancel Order
 ```
 
-## UC01 Browse All Products
+## UC01 Browse All Products (✓)
 
 **Actor:** Customer
 
@@ -62,7 +62,7 @@ Administrator
 
 ---
 
-## UC01.1 Browse Product Variants
+## UC01.1 Browse Product Variants (✓)
 
 **Actor:** Customer
 
@@ -84,7 +84,7 @@ Administrator
 
 ---
 
-## UC01.2 Browse Products by Category
+## UC01.2 Browse Products by Category (✓)
 
 **Actor:** Customer
 
@@ -111,7 +111,7 @@ Administrator
 ---- 
 
 
-## UC02 Add Product Variant to Cart
+## UC02 Add Product Variant to Cart (✓)
 
 **Actor:** Customer
 
@@ -150,7 +150,7 @@ Administrator
 
 ---
 
-## UC03 View Cart
+## UC03 View Cart (✓)
 
 **Actor:** Customer
 
@@ -180,7 +180,7 @@ Administrator
 
 ---
 
-## UC04 Update Cart Item Quantity
+## UC04 Update Cart Item Quantity (✓)
 
 **Actor:** Customer
 
@@ -247,7 +247,7 @@ Administrator
 
 ---
 
-## UC06 Place Order
+## UC06 Place Order (✓)
 
 **Actor:** Customer
 
