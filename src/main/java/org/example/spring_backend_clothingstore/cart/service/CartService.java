@@ -7,4 +7,5 @@ import org.springframework.data.domain.Pageable;
 public interface CartService {
     AddCartItemResult addProductVariantToCart(String guestId, Long variantId, int quantity);
     CartResponse getCartByGuestId(String guestId, Pageable pageable);
+    UpdateCartItemResult updateCartItemQuantity(String guestId, Long cartItemId, int quantity);
 }

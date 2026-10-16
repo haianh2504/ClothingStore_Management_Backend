@@ -15,6 +15,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +52,11 @@ public class Product {
     @DecimalMin(value = "0.00")
     private BigDecimal price;
 
+    @Column(name = "deleted_at")
+    private OffsetDateTime deletedAt;
+
     @OneToMany(mappedBy = "product")
     private List<ProductVariant> variants = new ArrayList<>();
+
+
 }

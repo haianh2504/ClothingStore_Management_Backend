@@ -11,6 +11,8 @@ import org.example.spring_backend_clothingstore.cart.repository.CartRepository;
 import org.example.spring_backend_clothingstore.cart_item.entity.CartItem;
 import org.example.spring_backend_clothingstore.cart_item.repository.CartItemRepository;
 import org.example.spring_backend_clothingstore.cart.dto.response.CartResponse;
+import org.example.spring_backend_clothingstore.exception.resource.CartItemNotFoundException;
+import org.example.spring_backend_clothingstore.exception.resource.CartNotFoundException;
 import org.example.spring_backend_clothingstore.exception.resource.ProductVariantNotFoundException;
 import org.example.spring_backend_clothingstore.product.entity.product_enum.SaleStatus;
 import org.example.spring_backend_clothingstore.product_variant.entity.ProductVariant;
@@ -116,5 +118,47 @@ public class CartServiceImpl implements CartService {
                 .orElseGet(() -> CartResponse.empty(
                         org.springframework.data.domain.Page.empty(pageable)
                 ));
+    }
+
+    // UPDATE CART ITEM QUANTITY
+    @Transactional
+    @Override
+    public UpdateCartItemResult updateCartItemQuantity(String guestId, Long cartItemId, int quantity) {
+        validateGuestId(guestId);
+
+        if (cartItemId == null || cartItemId <= 0) {
+            throw new CartItemNotFoundException(cartItemId);
+        }
+
+        if (quantity < 1) {
+            throw InvalidQuantityException.mustBeAtLeastOne();
+        }
+
+        Cart cart = cartRepository.findByGuestId(guestId)
+                .orElseThrow(CartNotFoundException::new);
+
+        CartItem cartItem = cartItemRepository.findByIdAndCart_Id(cartItemId, cart.getId())
+                .orElseThrow(() -> new CartItemNotFoundException(cartItemId));
+
+        ProductVariant variant = cartItem.getVariant();
+        if (variant.getProduct().getDeletedAt() != null
+                || variant.getProduct().getSaleStatus() != SaleStatus.ACTIVE
+                || variant.getDeletedAt() != null) {
+            throw new ProductInactiveForCartException(
+                    "Failed: Product [id=" + variant.getProduct().getId() + "] is no longer available"
+            );
+        }
+
+        if (quantity > variant.getQuantity()) {
+            throw new InsufficientStockException(quantity, variant.getQuantity());
+        }
+
+        boolean unchanged = cartItem.getQuantity() == quantity;
+        if (!unchanged) {
+            cartItem.setQuantity(quantity);
+            cartItemRepository.save(cartItem);
+        }
+
+        return new UpdateCartItemResult(toCartResponse(cart), unchanged);
     }
 }

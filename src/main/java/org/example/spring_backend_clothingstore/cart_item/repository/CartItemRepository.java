@@ -35,5 +35,8 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     // Find by cart and variant Id
     Optional<CartItem> findByCart_IdAndVariant_Id(Long cartId, Long variantId);
 
+    @EntityGraph(attributePaths = {"variant", "variant.product"})
+    Optional<CartItem> findByIdAndCart_Id(Long id, Long cartId);
+
 
 }
