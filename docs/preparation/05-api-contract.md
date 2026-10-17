@@ -1095,3 +1095,222 @@ Body:
    "timestamp": "2026-10-02T14:30:00+07:00"
 }
 ```
+
+
+## UC08 Administrator Login
+
+### REQUEST: ###
+
+**Endpoint:** `POST /api/v1/admin/sessions`
+
+The endpoint creates an authenticated server-side administrator session. The
+session identifier is returned in the `Set-Cookie` response header, not in the
+JSON response body.
+
+**Request Body:**
+```json
+{
+   "email": "haianh2504088@gmail.com",
+   "password": "rawPassword"
+}
+```
+
+**Path Parameters:** none
+
+**Query Parameters:** none
+
+
+### SUCCESS PATH:
+
+**1. Success Response:**
+Status: `200 OK`
+
+Response headers:
+```http
+Content-Type: application/json
+Set-Cookie: ADMIN_SESSION=<opaque-session-id>; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=1800
+```
+
+Body:
+```json
+{
+   "status": 200,
+   "code": "ADMIN_LOGIN_SUCCESS",
+   "message": "Admin login successful",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "data": {
+      "authenticated": true
+   }
+}
+```
+
+### BAD PATH: ###
+
+**1. Error Response - Too many login attempts:**
+Status: `429 Too Many Requests`
+
+Response headers:
+```http
+Retry-After: 60
+```
+
+Body:
+```json
+{
+   "status": 429,
+   "code": "TOO_MANY_REQUEST",
+   "message": "Too many login attempts. Please try again later.",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+**2. Error Response - Invalid credentials:**
+Status: `401 Unauthorized`
+Body:
+```json
+{
+   "status": 401,
+   "code": "INVALID_CREDENTIALS",
+   "message": "Invalid email or password",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+The response must not reveal whether the email address exists.
+
+**3. Error Response - Invalid login request:**
+Status: `400 Bad Request`
+Body:
+```json
+{
+   "status": 400,
+   "code": "INVALID_LOGIN_REQUEST",
+   "message": "Email and password are required",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "errors": [
+      {
+         "field": "email",
+         "message": "Email must not be blank"
+      },
+      {
+         "field": "password",
+         "message": "Password must not be blank"
+      }
+   ]
+}
+```
+
+
+## UC08.1 View Current Administrator Session
+
+### REQUEST: ###
+
+**Endpoint:** `GET /api/v1/admin/sessions/current`
+
+The request must include the administrator session cookie created by UC08.
+The opaque session identifier must not be included in the URL or JSON body.
+
+**Request Body:** none
+
+**Path Parameters:** none
+
+**Query Parameters:** none
+
+
+### SUCCESS PATH:
+
+**1. Success Response:**
+Status: `200 OK`
+
+Body:
+```json
+{
+   "status": 200,
+   "code": "ADMIN_SESSION_RETRIEVED",
+   "message": "Current admin session retrieved successfully",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "data": {
+      "authenticated": true,
+      "adminId": 1,
+      "email": "haianh2504088@gmail.com"
+   }
+}
+```
+
+### BAD PATH: ###
+
+**1. Error Response - Session is missing, invalid, or expired:**
+Status: `401 Unauthorized`
+Body:
+```json
+{
+   "status": 401,
+   "code": "ADMIN_SESSION_UNAUTHORIZED",
+   "message": "Admin session is missing, invalid, or expired",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+**2. Error Response - Administrator is inactive:**
+Status: `401 Unauthorized`
+Body:
+```json
+{
+   "status": 401,
+   "code": "ADMIN_ACCOUNT_INACTIVE",
+   "message": "Administrator account is inactive",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+
+## UC08.2 Administrator Logout
+
+### REQUEST: ###
+
+**Endpoint:** `DELETE /api/v1/admin/sessions/current`
+
+The request must include the administrator session cookie when a session is
+active. The operation is idempotent: an already missing or expired session is
+treated as logged out.
+
+**Request Body:** none
+
+**Path Parameters:** none
+
+**Query Parameters:** none
+
+
+### SUCCESS PATH:
+
+**1. Success Response:**
+Status: `200 OK`
+
+Response headers:
+```http
+Content-Type: application/json
+Set-Cookie: ADMIN_SESSION=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0
+```
+
+Body:
+```json
+{
+   "status": 200,
+   "code": "ADMIN_LOGOUT_SUCCESS",
+   "message": "Admin logout successful",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "data": {
+      "authenticated": false
+   }
+}
+```
+
+The `Set-Cookie` header must use the same cookie name, `Path`, `Secure`, and
+`SameSite` attributes as the login response, with `Max-Age=0` to expire the
+cookie.
+
+### BAD PATH: ###
+
+The operation is idempotent and therefore does not return an error when the
+session cookie is missing, invalid, or already expired. It returns the same
+successful response described above.

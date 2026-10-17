@@ -19,7 +19,9 @@ Customer
 
 Administrator
 ├── Authentication
-│   └── UC08 Administrator Login
+│   ├── UC08 Administrator Login
+│   ├── UC08.1 View Current Administrator Session
+│   └── UC08.2 Administrator Logout
 │
 ├── Product
 │   ├── UC09 Create Product
@@ -352,6 +354,63 @@ Administrator
 **Postconditions:**
 
 - The administrator is authenticated and can access protected management functions.
+
+---
+
+## UC08.1 View Current Administrator Session
+
+**Actor:** Administrator
+
+**Preconditions:**
+
+- The administrator has an authenticated server-side session.
+- The request contains the administrator session cookie.
+
+**Main flow:**
+
+1. The frontend sends a request to retrieve the current administrator session.
+2. The system reads the opaque session cookie.
+3. The system finds and validates the server-side session.
+4. The system retrieves the authenticated administrator account.
+5. The system returns the current authentication state and minimal administrator information.
+
+**Alternative flows:**
+
+- If the session cookie is missing, invalid, or expired, the system returns an unauthorized response.
+- If the administrator account is no longer active, the system invalidates the session and returns an unauthorized response.
+
+**Postconditions:**
+
+- No business data is changed.
+- A valid session remains active.
+
+---
+
+## UC08.2 Administrator Logout
+
+**Actor:** Administrator
+
+**Preconditions:**
+
+- The administrator has an authenticated server-side session.
+
+**Main flow:**
+
+1. The administrator selects the logout action.
+2. The frontend sends a request to delete the current administrator session.
+3. The system reads the opaque session cookie.
+4. The system invalidates the corresponding server-side session.
+5. The system clears the session cookie in the response.
+6. The system returns a successful logout response.
+
+**Alternative flows:**
+
+- If the session is already missing, invalid, or expired, the system keeps the administrator unauthenticated and returns a successful idempotent logout response.
+
+**Postconditions:**
+
+- The server-side session cannot authenticate further requests.
+- The browser no longer retains a usable administrator session cookie.
 
 ---
 
