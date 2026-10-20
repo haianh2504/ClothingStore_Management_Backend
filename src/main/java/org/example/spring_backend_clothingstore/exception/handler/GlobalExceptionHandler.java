@@ -6,6 +6,7 @@ import org.example.spring_backend_clothingstore.exception.response.ErrorResponse
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MissingRequestHeaderException;
@@ -79,6 +80,19 @@ public class GlobalExceptionHandler {
                         "INVALID_INFORMATION_PROVIDED",
                         "Failed: Invalid details provided",
                         errors
+                ));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(
+            AuthenticationException exception
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ErrorResponse.from(
+                        HttpStatus.UNAUTHORIZED.value(),
+                        "INVALID_CREDENTIALS",
+                        "Invalid email or password"
                 ));
     }
 

@@ -1178,16 +1178,16 @@ Body:
 
 The response must not reveal whether the email address exists.
 
-**3. Error Response - Invalid login request:**
+**3. Error Response - Invalid information:**
 Status: `400 Bad Request`
 Body:
 ```json
 {
    "status": 400,
-   "code": "INVALID_LOGIN_REQUEST",
-   "message": "Email and password are required",
+   "code": "INVALID_INFORMATION_PROVIDED",
+   "message": "Failed: Invalid details provided",
    "timestamp": "2026-10-02T14:30:00+07:00",
-   "errors": [
+   "error": [
       {
          "field": "email",
          "message": "Email must not be blank"
@@ -1199,6 +1199,9 @@ Body:
    ]
 }
 ```
+
+The `error` list contains field-specific validation messages for missing,
+blank, malformed, or otherwise invalid values.
 
 
 ## UC08.1 View Current Administrator Session
