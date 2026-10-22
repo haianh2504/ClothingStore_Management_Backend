@@ -1,27 +1,56 @@
 # Clothing Store Demo
 
-A small full-stack clothing store built to practice Spring Boot, JPA, Hibernate, basic transaction-management, PostgreSQL and Next.js.
+A backend for a clothing store built to practice Spring Boot, JPA, Hibernate,
+transaction management, PostgreSQL, Redis and REST API development.
 
 ## Project Status
 
 Currently building the backend
 
-## Planned Technology Stack
+## Technology Stack
 
-***Building Stack:***
+### Language and Build
 
-- Spring Boot
+- Java 21
+- Maven
+- Lombok
+
+### Backend
+
+- Spring Boot 4.1.1
+- Spring Web MVC for REST APIs
 - Spring Data JPA
-- Hibernate
+- Hibernate ORM
+- Spring Validation
+- Spring Security
+- Spring Session with Redis
+- Spring Data Redis
+- Redis
 - PostgreSQL
+
+### Application Features
+
+- Cookie-based administrator sessions using `ADMIN_SESSION`
+- Role-based administrator authorization
+- BCrypt password hashing
+- Redis-backed fixed-window rate limiting
+- Layered architecture with Controller, Service, Repository and DTOs
+- Standardized API responses and exception handling
+
+### Testing and Development
+
+- JUnit Jupiter
+- Spring Security Test
+- Spring Data JPA Test
+- Spring Validation Test
+- MockMvc
+- Integration testing
+- Spring Boot DevTools
+
+### Planned Frontend
+
 - Next.js
 - TypeScript
-
-***Testing Stack:***
-
-- Junit Jupiter
-- Mockmvc
-- Integration Test
 ## Documentation
 
 - [Business Requirements](./docs/preparation/01-business-requirements.md)
