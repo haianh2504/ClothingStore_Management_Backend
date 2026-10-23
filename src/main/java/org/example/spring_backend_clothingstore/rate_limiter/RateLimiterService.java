@@ -19,22 +19,46 @@ public class RateLimiterService {
     private final StringRedisTemplate stringRedisTemplate; // <String, String>
 
     // trong 60s chỉ nhận tối đa 5 requests vào servlet container để xử lý...
-    private static final int MAX_REQUESTS = 5;
+    private static final int GLOBAL_MAX_REQUESTS = 100;
     private static final Duration WINDOW_TIME_SECONDS = Duration.ofSeconds(60);
 
-    public boolean tryAcquire(String clientKey)
+    public boolean tryAcquire1stLayer(String clientKey)
     {
-        String redisKey = "rate-limit:" + clientKey;
+        String redisKey = "rate-limit:ip:" + clientKey;
 
         Long requestCount = stringRedisTemplate
                 .opsForValue()
                 .increment(redisKey);
 
-        if(requestCount == null || requestCount > MAX_REQUESTS)
+        if(requestCount == null || requestCount > GLOBAL_MAX_REQUESTS)
         {
             return false;
         }
         // Bắt đầu thiết lập thời gian hết hạn chỉ cho request đầu tiên
+        if(requestCount == 1L)
+        {
+            stringRedisTemplate.expire(redisKey, WINDOW_TIME_SECONDS);
+        }
+        return true;
+    }
+    // method key
+    public boolean tryAccquire2ndLayer(String methodkey, String clientKey)
+    {
+        String redisKey = "rate-limit:method:" + methodkey + ":" + clientKey;
+        int maxRequests = switch(methodkey)
+        {
+            case "GET" -> 15;
+            case "POST" -> 5;
+            default -> 10;
+        };
+
+        Long requestCount = stringRedisTemplate
+                .opsForValue()
+                .increment(redisKey);
+        if(requestCount == null || requestCount > maxRequests)
+        {
+            return false;
+        }
         if(requestCount == 1L)
         {
             stringRedisTemplate.expire(redisKey, WINDOW_TIME_SECONDS);

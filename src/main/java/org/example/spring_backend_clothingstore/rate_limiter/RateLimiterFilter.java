@@ -22,11 +22,13 @@ public class RateLimiterFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        String clientKey = getClientKey(request);
+        String clientKey = getClientKey(request); // address IP
+        String methodKey = getMethodKey(request); // HTTP method
 
-        boolean allowed = rateLimiterService.tryAcquire(clientKey);
+        boolean globalAllowed = rateLimiterService.tryAcquire1stLayer(clientKey);
+        boolean methodAllowed = rateLimiterService.tryAccquire2ndLayer(methodKey,clientKey);
 
-        if(!allowed){
+        if(!globalAllowed || !methodAllowed) {
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             response.setContentType("application/json");
             response.getWriter().write("""
@@ -45,7 +47,12 @@ public class RateLimiterFilter extends OncePerRequestFilter {
     // getClientKey ( IP address )
     private String getClientKey(HttpServletRequest request) {
         String clientIP = request.getRemoteAddr();
-        return request.getMethod() + ":" + request.getRequestURI() + ":" + clientIP;
+        return clientIP;
+    }
+    // getMethod
+    private String getMethodKey(HttpServletRequest request) {
+        String method = request.getMethod();
+        return method;
     }
 }
 
