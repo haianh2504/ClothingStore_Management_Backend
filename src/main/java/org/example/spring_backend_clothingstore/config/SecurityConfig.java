@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -29,7 +30,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // khi sử dụng JWT, còn cookie phải bật để bảo vệ khỏi CSRF
+                .csrf(csrf -> csrf
+                        // Browser đọc token từ XSRF-TOKEN và gửi lại qua X-XSRF-TOKEN.
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                )
+                .sessionManagement(session -> session
+                        // Đổi session ID sau khi authentication thành công,
+                        // giữ nguyên session và tránh session fixation.
+                        .sessionFixation(sessionFixation -> sessionFixation.changeSessionId())
+                )
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers(HttpMethod.POST, "/api/v1/admin/sessions").permitAll() // login

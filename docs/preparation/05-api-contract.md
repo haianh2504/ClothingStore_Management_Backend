@@ -1107,6 +1107,12 @@ The endpoint creates an authenticated server-side administrator session. The
 session identifier is returned in the `Set-Cookie` response header, not in the
 JSON response body.
 
+After successful authentication, the system must rotate the session identifier.
+The session identifier that existed before authentication must not remain valid
+for the authenticated session. The session identifier is opaque and must not
+contain the administrator email, password, password hash, role, or other
+personal data.
+
 **Request Body:**
 ```json
 {
@@ -1125,7 +1131,7 @@ JSON response body.
 **1. Success Response:**
 Status: `200 OK`
 
-Response headers:
+Response headers (the server creates the cookie):
 ```http
 Content-Type: application/json
 Set-Cookie: ADMIN_SESSION=<opaque-session-id>; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=1800
@@ -1210,8 +1216,14 @@ blank, malformed, or otherwise invalid values.
 
 **Endpoint:** `GET /api/v1/admin/sessions/current`
 
-The request must include the administrator session cookie created by UC08.
-The opaque session identifier must not be included in the URL or JSON body.
+**Request Header (the browser sends the cookie automatically; example only):**
+```http
+Cookie: ADMIN_SESSION=abc123
+```
+
+The request must include the administrator session cookie created by UC08. The
+client must not construct, modify, or expose the opaque session identifier in
+the URL or JSON body.
 
 **Request Body:** none
 
@@ -1224,7 +1236,7 @@ The opaque session identifier must not be included in the URL or JSON body.
 
 **1. Success Response:**
 Status: `200 OK`
-
+`Content-Type: application/json`
 Body:
 ```json
 {
@@ -1234,7 +1246,6 @@ Body:
    "timestamp": "2026-10-02T14:30:00+07:00",
    "data": {
       "authenticated": true,
-      "adminId": 1,
       "email": "haianh2504088@gmail.com"
    }
 }
@@ -1254,28 +1265,15 @@ Body:
 }
 ```
 
-**2. Error Response - Administrator is inactive:**
-Status: `401 Unauthorized`
-Body:
-```json
-{
-   "status": 401,
-   "code": "ADMIN_ACCOUNT_INACTIVE",
-   "message": "Administrator account is inactive",
-   "timestamp": "2026-10-02T14:30:00+07:00"
-}
-```
-
-
 ## UC08.2 Administrator Logout
 
 ### REQUEST: ###
 
 **Endpoint:** `DELETE /api/v1/admin/sessions/current`
 
-The request must include the administrator session cookie when a session is
-active. The operation is idempotent: an already missing or expired session is
-treated as logged out.
+The browser sends the administrator session cookie automatically when a session
+is active. The operation is idempotent: an already missing or expired session
+is treated as logged out.
 
 **Request Body:** none
 
@@ -1289,7 +1287,7 @@ treated as logged out.
 **1. Success Response:**
 Status: `200 OK`
 
-Response headers:
+Response headers (the server expires the cookie):
 ```http
 Content-Type: application/json
 Set-Cookie: ADMIN_SESSION=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0

@@ -3,6 +3,7 @@ package org.example.spring_backend_clothingstore.admin.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.example.spring_backend_clothingstore.admin.dto.LoginRequest;
 import org.example.spring_backend_clothingstore.admin.dto.LoginResponse;
 import org.example.spring_backend_clothingstore.api_response_schema.ApiResponse;
@@ -23,15 +24,12 @@ import java.time.OffsetDateTime;
 
 @RestController
 @RequestMapping("/api/v1/admin")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final SecurityContextRepository securityContextRepository =
             new HttpSessionSecurityContextRepository();
-
-    public AuthController(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
-    }
 
     @PostMapping("/sessions")
     public ResponseEntity<ApiResponse<LoginResponse>> login(
@@ -39,12 +37,21 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
+        // Chưa xác thực và xác thực rồi sẽ cập nhật thông tin sau đó
+        // Nếu đăng nhập thất bại -> tung authenticationException
         Authentication authentication = authenticationManager.authenticate(
+                // Khởi tạo đối tượng authentication thô
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.email(),
                         loginRequest.password()
                 )
         );
+        // Đảm bảo có session trước khi áp dụng servlet/Spring session ID rotation.
+        request.getSession(true);
+
+        // session fixation protection:
+        // sessionID trước login sẽ không còn được dùng cho authenticated session
+        request.changeSessionId();
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);

@@ -342,9 +342,10 @@ Administrator
 3. The frontend sends the credentials to the system.
 4. The system finds the administrator account by email.
 5. The system verifies the submitted password against the stored password hash.
-6. The system creates an authenticated server-side session.
-7. The system returns a successful authentication response and sets an opaque session cookie.
-8. The frontend redirects the administrator to the management page.
+6. The system rotates the session identifier so that an identifier issued before authentication cannot be reused after login.
+7. The system creates an authenticated server-side session associated with the new session identifier.
+8. The system returns a successful authentication response and sets an opaque session cookie.
+9. The frontend redirects the administrator to the management page.
 
 **Alternative flows:**
 
@@ -377,7 +378,6 @@ Administrator
 **Alternative flows:**
 
 - If the session cookie is missing, invalid, or expired, the system returns an unauthorized response.
-- If the administrator account is no longer active, the system invalidates the session and returns an unauthorized response.
 
 **Postconditions:**
 
