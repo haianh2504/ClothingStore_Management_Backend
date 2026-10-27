@@ -25,7 +25,7 @@ public class AdminAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(
-            HttpServletRequest request, // handled in servlet / filter  <>  in controller
+            HttpServletRequest request,
             HttpServletResponse response,
             AuthenticationException authenticationException
     ) throws IOException, ServletException {
