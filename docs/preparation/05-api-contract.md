@@ -1097,11 +1097,50 @@ Body:
 ```
 
 
+## UC08 Administrator Authentication CSRF Contract
+
+The API uses server-side sessions stored behind the `ADMIN_SESSION` cookie.
+Because browsers send cookies automatically, browser clients must obtain a
+CSRF token before sending state-changing requests such as login and logout.
+
+### CSRF TOKEN REQUEST
+
+**Endpoint:** `GET /api/v1/csrf-token`
+
+**Request Body:** none
+
+**Response:** `200 OK` with an empty body
+
+The response sets a non-HttpOnly cookie:
+
+```http
+Set-Cookie: XSRF-TOKEN=<csrf-token>; Path=/; SameSite=Lax
+```
+
+The frontend reads the `XSRF-TOKEN` cookie and sends the same value in the
+`X-XSRF-TOKEN` header on subsequent state-changing requests. The CSRF token is
+not an administrator credential and must not be used as the session ID.
+
+### CSRF-PROTECTED REQUEST HEADER
+
+```http
+X-XSRF-TOKEN: <value of the XSRF-TOKEN cookie>
+```
+
+`GET` requests such as UC08.1 do not require this header. Login and logout do
+require it while CSRF protection is enabled.
+
 ## UC08 Administrator Login
 
 ### REQUEST: ###
 
 **Endpoint:** `POST /api/v1/admin/sessions`
+
+**Request Header:**
+
+```http
+X-XSRF-TOKEN: <value of the XSRF-TOKEN cookie>
+```
 
 The endpoint creates an authenticated server-side administrator session. The
 session identifier is returned in the `Set-Cookie` response header, not in the
@@ -1254,6 +1293,11 @@ Body:
 ### BAD PATH: ###
 
 **1. Error Response - Session is missing, invalid, or expired:**
+Description:
+- Will be handled and checked by SecurityContextPersistenceFilter / Repository
+- Request become `anomynous`
+- Throw `401` before controller approach
+
 Status: `401 Unauthorized`
 Body:
 ```json
@@ -1270,6 +1314,15 @@ Body:
 ### REQUEST: ###
 
 **Endpoint:** `DELETE /api/v1/admin/sessions/current`
+
+**Request Header:**
+
+```http
+X-XSRF-TOKEN: <value of the XSRF-TOKEN cookie>
+```
+
+The `ADMIN_SESSION` cookie is optional for this idempotent logout request, but
+the CSRF header is still required.
 
 The browser sends the administrator session cookie automatically when a session
 is active. The operation is idempotent: an already missing or expired session

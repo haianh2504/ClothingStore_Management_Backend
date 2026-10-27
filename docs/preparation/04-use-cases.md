@@ -328,6 +328,12 @@ Administrator
 
 ## UC08 Administrator Login
 
+**CSRF requirement:** Before the browser sends this `POST` request, it first
+requests `GET /api/v1/csrf-token`. The backend sets an `XSRF-TOKEN` cookie.
+The frontend reads that cookie and sends its value in the `X-XSRF-TOKEN`
+header. The `ADMIN_SESSION` cookie authenticates the administrator after login;
+the CSRF token protects this cookie-based request from cross-site submission.
+
 **Actor:** Administrator
 
 **Preconditions:**
@@ -367,6 +373,8 @@ Administrator
 - The administrator has an authenticated server-side session.
 - The request contains the administrator session cookie.
 
+This read-only `GET` request does not require the `X-XSRF-TOKEN` header.
+
 **Main flow:**
 
 1. The frontend sends a request to retrieve the current administrator session.
@@ -393,6 +401,12 @@ Administrator
 **Preconditions:**
 
 - The administrator has an authenticated server-side session.
+
+Before sending the `DELETE` request, the frontend must obtain the
+`XSRF-TOKEN` cookie from `GET /api/v1/csrf-token` and send its value in the
+`X-XSRF-TOKEN` request header. CSRF validation is required even though logout
+is idempotent and does not require an authenticated session at the
+authorization rule level.
 
 **Main flow:**
 

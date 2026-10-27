@@ -1,5 +1,6 @@
 package org.example.spring_backend_clothingstore.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,7 +15,10 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final AdminAuthenticationEntryPoint adminAuthenticationEntryPoint;
+
     // khai bao Bean PasswordEncoder
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -42,10 +46,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers(HttpMethod.POST, "/api/v1/admin/sessions").permitAll() // login
+                                .requestMatchers(HttpMethod.DELETE, "/api/v1/admin/sessions/current").permitAll() // logout
                                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN") // authorized
                                 .anyRequest().permitAll()
+                )
+                // Thêm bộ xử lý exception riêng ở SecurityFilterChain về session ( đặc biệt là UC08.1 )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(adminAuthenticationEntryPoint)
                 );
-        return http.build();
+        return http.build(); // tạo SecurityFilterChain cho FilterChainProxy quản lý
     }
 
 }
