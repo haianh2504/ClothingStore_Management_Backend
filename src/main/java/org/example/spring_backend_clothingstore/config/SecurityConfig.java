@@ -10,8 +10,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
+import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -30,13 +32,27 @@ public class SecurityConfig {
     {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
+    /**
+     * Apply XOR masking to CSRF tokens exposed through request attributes.
+     * This protects against BREACH-style compression side-channel attacks.
+     */
+    @Bean
+    public CsrfTokenRequestHandler csrfTokenRequestHandler() {
+        return new XorCsrfTokenRequestAttributeHandler();
+    }
+
     // Cấu hình chuỗi bộ lọc ( Security Filter Chaining )
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            CsrfTokenRequestHandler csrfTokenRequestHandler
+    ) throws Exception {
         http
                 .csrf(csrf -> csrf
                         // Browser đọc token từ XSRF-TOKEN và gửi lại qua X-XSRF-TOKEN.
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRequestHandler(csrfTokenRequestHandler)
                 )
                 .sessionManagement(session -> session
                         // Đổi session ID sau khi authentication thành công,

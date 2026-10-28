@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class CsrfController {
 
     @GetMapping("/csrf-token")
-    public void csrfToken(CsrfToken ignoredToken) {
+    public void csrfToken(CsrfToken csrfToken) {
         // Resolving CsrfToken causes CookieCsrfTokenRepository to issue XSRF-TOKEN.
+        csrfToken.getToken();
     }
 }
