@@ -12,8 +12,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
-import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -39,7 +39,7 @@ public class SecurityConfig {
      */
     @Bean
     public CsrfTokenRequestHandler csrfTokenRequestHandler() {
-        return new XorCsrfTokenRequestAttributeHandler();
+        return new CsrfTokenRequestAttributeHandler();
     }
 
     // Cấu hình chuỗi bộ lọc ( Security Filter Chaining )
