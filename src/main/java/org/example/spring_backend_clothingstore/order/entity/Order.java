@@ -32,6 +32,10 @@ public class Order {
     @Column(name = "order_code", nullable = false, length = 250)
     private String orderCode;
 
+    // Guest ID giúp xác định đơn hàng thuộc về giỏ hàng guest nào.
+    @Column(name = "guest_id", nullable = false, length = 255)
+    private String guestId;
+
     @Convert(converter = CustomerNameConverter.class)
     @Column(name = "customer_name", nullable = false, length = 255)
     private CustomerName customerName;
@@ -63,8 +67,10 @@ public class Order {
     @OneToMany(mappedBy = "order")
     private List<OrderItem> items = new ArrayList<>();
 
+    // Tạo order mới và lưu guest ID để sau này truy vấn đúng order của guest.
     public Order(
             String orderCode,
+            String guestId,
             CustomerName customerName,
             PhoneNumber phoneNumber,
             String email,
@@ -72,6 +78,7 @@ public class Order {
             BigDecimal totalPrice
     ) {
         this.orderCode = orderCode;
+        this.guestId = guestId;
         this.customerName = customerName;
         this.phoneNumber = phoneNumber;
         this.email = email;

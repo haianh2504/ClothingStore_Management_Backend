@@ -12,6 +12,9 @@ import org.example.spring_backend_clothingstore.exception.business.InvalidCustom
 import org.example.spring_backend_clothingstore.exception.business.OperationFailedException;
 import org.example.spring_backend_clothingstore.exception.business.ProductUnavailableException;
 import org.example.spring_backend_clothingstore.exception.resource.CartNotFoundException;
+import org.example.spring_backend_clothingstore.exception.resource.OrderNotFoundException;
+import org.example.spring_backend_clothingstore.order.dto.GuestOrderDetailResponse;
+import org.example.spring_backend_clothingstore.order.dto.GuestOrderHistoryResponse;
 import org.example.spring_backend_clothingstore.order.dto.OrderResponse;
 import org.example.spring_backend_clothingstore.order.dto.PlaceOrderRequest;
 import org.example.spring_backend_clothingstore.order.entity.Order;
@@ -24,6 +27,7 @@ import org.example.spring_backend_clothingstore.product_variant.entity.ProductVa
 import org.example.spring_backend_clothingstore.product_variant.repository.ProductVariantRepository;
 import org.example.spring_backend_clothingstore.guest.GuestIdValidator;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -84,6 +88,7 @@ public class OrderServiceImpl implements OrderService {
 
             Order order = new Order(
                     generateOrderCode(),
+                    guestId,
                     customerName,
                     phoneNumber,
                     email,
@@ -118,6 +123,32 @@ public class OrderServiceImpl implements OrderService {
         } catch (RuntimeException exception) {
             throw new OperationFailedException(exception);
         }
+    }
+
+    /** Lấy các order của guest hiện tại theo thứ tự mới nhất trước. */
+    @Transactional(readOnly = true)
+    @Override
+    public GuestOrderHistoryResponse getGuestOrderHistory(String guestId, Pageable pageable) {
+        validateGuestId(guestId);
+        return GuestOrderHistoryResponse.from(
+                orderRepository.findByGuestIdOrderByCreatedAtDesc(guestId, pageable)
+        );
+    }
+
+    /** Lấy chi tiết order và kiểm tra order thuộc guest hiện tại. */
+    @Transactional(readOnly = true)
+    @Override
+    public GuestOrderDetailResponse getGuestOrderDetail(String guestId, String orderCode) {
+        validateGuestId(guestId);
+
+        if (orderCode == null || orderCode.isBlank()) {
+            throw new OrderNotFoundException();
+        }
+
+        Order order = orderRepository.findByOrderCodeAndGuestId(orderCode, guestId)
+                .orElseThrow(OrderNotFoundException::new);
+
+        return GuestOrderDetailResponse.from(order);
     }
 
     private void collectAvailabilityError(

@@ -43,7 +43,7 @@ ALTER TABLE product_variants
         FOREIGN KEY (product_id) REFERENCES products(id);
 
 CREATE TABLE carts(
-                      id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY ,
+                      id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY
 );
 
 CREATE TABLE cart_items(
@@ -97,3 +97,7 @@ ALTER TABLE order_items
         UNIQUE (variant_id,order_code);
 
 ALTER TABLE carts ADD CONSTRAINT uq_cart_guest_id UNIQUE (guest_id);
+
+ALTER TABLE orders ADD COLUMN guest_id VARCHAR(255) NOT NULL;
+
+CREATE INDEX idx_orders_guest_id_created_at ON orders (guest_id, created_at DESC);

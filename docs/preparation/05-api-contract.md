@@ -505,6 +505,162 @@ cookie. The request is still processed normally.
 
 
 
+# UC07 Guest Order History and Order Lookup
+
+Guest order access uses the backend-managed `GUEST_ID` cookie. The client must
+not send a guest ID in the URL, request body, or custom header.
+
+## UC07.1 View Guest Order History
+
+This endpoint returns only orders belonging to the current guest cookie. It
+returns order summaries and does not expose delivery address, phone number,
+email, or full order items in the list response.
+
+**Endpoint:** `GET /api/v1/orders`
+
+**Cookie:** `GUEST_ID` is sent automatically by the browser.
+
+`GET` requests do not require the `X-XSRF-TOKEN` header.
+
+**Request Body:** none
+
+**Request Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+| :-------- | :--- | :------- | :------ | :---------- |
+| `page` | integer | No | `0` | Zero-based page number |
+| `size` | integer | No | `20` | Number of orders per page; maximum `100` |
+| `sort` | string | No | `createdAt,desc` | Sorting expression |
+
+**Path Parameters:** none
+
+### SUCCESS PATH:
+
+If the guest has no orders, the endpoint returns `200 OK` with an empty
+`items` list. If the `GUEST_ID` cookie is missing or invalid, the backend
+creates and sets a new cookie and returns the same empty-history response.
+
+```json
+{
+   "status": 200,
+   "code": "GUEST_ORDERS_RETRIEVED",
+   "message": "Guest orders retrieved successfully",
+   "timestamp": "2026-10-29T14:30:00+07:00",
+   "data": {
+      "items": [
+         {
+            "orderCode": "AB1233422MXY",
+            "status": "PENDING",
+            "totalItems": 2,
+            "totalQuantity": 5,
+            "totalPrice": 2040000,
+            "createdAt": "2026-10-07T13:30:00+07:00"
+         }
+      ],
+      "pagination": {
+         "page": 0,
+         "size": 20,
+         "totalElements": 1,
+         "totalPages": 1,
+         "first": true,
+         "last": true
+      }
+   }
+}
+```
+
+## UC07.2 View Guest Order Detail
+
+The backend must match both the path order code and the current guest cookie.
+An order belonging to another guest is returned as `404`, so the API does not
+reveal whether that order code exists.
+
+**Endpoint:** `GET /api/v1/orders/{orderCode}`
+
+**Cookie:** `GUEST_ID` is sent automatically by the browser.
+
+`GET` requests do not require the `X-XSRF-TOKEN` header.
+
+**Request Body:** none
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+| :-------- | :--- | :------- | :---------- |
+| `orderCode` | string | Yes | The order code to retrieve |
+
+### SUCCESS PATH:
+
+**1. Success Response:**
+Status: `200 OK`
+
+```json
+{
+   "status": 200,
+   "code": "ORDER_DETAIL_RETRIEVED",
+   "message": "Order detail retrieved successfully",
+   "timestamp": "2026-10-29T14:30:00+07:00",
+   "data": {
+      "orderCode": "AB1233422MXY",
+      "status": "PENDING",
+      "customerName": "Phan Hai Anh",
+      "phoneNumber": "09329838551",
+      "email": "haianh260406@gmail.com",
+      "deliveryAddress": "72A-KP3-T09, Phuong An Binh, Bien Hoa, Dong Nai",
+      "totalPrice": 2040000,
+      "createdAt": "2026-10-07T13:30:00+07:00",
+      "items": [
+         {
+            "orderItemId": 1,
+            "variantId": 132,
+            "productName": "T-shirt hella",
+            "size": "M",
+            "quantity": 2,
+            "color": "red",
+            "unitPrice": 20000
+         }
+      ]
+   }
+}
+```
+
+## UC07.3 Recover Order by Order Code and Phone Number
+
+This endpoint supports recovery when the guest loses the `GUEST_ID` cookie or
+uses another browser/device. It is independent of the guest cookie and should
+be rate-limited because it uses customer-provided identifying information.
+
+**Endpoint:** `GET /api/v1/orders/lookup`
+
+**Request Body:** none
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+| :-------- | :--- | :------- | :---------- |
+| `orderCode` | string | Yes | The order code |
+| `phoneNumber` | string | Yes | The phone number used when placing the order |
+
+`GET` requests do not require the `X-XSRF-TOKEN` header.
+
+### BAD PATH:
+
+**1. Error Response - order not found or ownership information does not match:**
+Status: `404 Not Found`
+
+```json
+{
+   "status": 404,
+   "code": "ORDER_NOT_FOUND",
+   "message": "Order was not found",
+   "timestamp": "2026-10-29T14:30:00+07:00"
+}
+```
+
+The API must use the same response for an unknown order code, a guest-owned
+order requested with another `GUEST_ID`, or a mismatched phone number.
+
+
 # Supporting API contract flow:
 
 
