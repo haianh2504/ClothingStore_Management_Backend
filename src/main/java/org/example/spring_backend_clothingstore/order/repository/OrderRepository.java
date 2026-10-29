@@ -20,6 +20,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     @EntityGraph(attributePaths = "items")
     Optional<Order> findByOrderCodeAndGuestId(String orderCode, String guestId);
 
-    // Find By Order Code & PhoneNumber
+    // Tìm order để khôi phục khi guest có order code và số điện thoại.
+    @EntityGraph(attributePaths = "items")
     Optional<Order> findByOrderCodeAndPhoneNumber(String orderCode, PhoneNumber phoneNumber);
 }

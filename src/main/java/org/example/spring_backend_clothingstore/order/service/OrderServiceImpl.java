@@ -151,6 +151,23 @@ public class OrderServiceImpl implements OrderService {
         return GuestOrderDetailResponse.from(order);
     }
 
+    /**
+     * Tìm lại order khi guest mất cookie hoặc dùng thiết bị khác.
+     * Cách này dùng hai thông tin đã biết của khách hàng để xác định order.
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public GuestOrderDetailResponse lookupOrder(String orderCode, String phoneNumber) {
+        String normalizedOrderCode = validateOrderCode(orderCode);
+        PhoneNumber validPhoneNumber = createPhoneNumber(phoneNumber);
+
+        Order order = orderRepository
+                .findByOrderCodeAndPhoneNumber(normalizedOrderCode, validPhoneNumber)
+                .orElseThrow(OrderNotFoundException::new);
+
+        return GuestOrderDetailResponse.from(order);
+    }
+
     private void collectAvailabilityError(
             List<ProductUnavailableException.AvailabilityError> errors,
             Product product,
@@ -213,11 +230,28 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private PhoneNumber createPhoneNumber(String value) {
+        if (value == null || value.isBlank()) {
+            throw new InvalidCustomerInformationException(
+                    "Failed: phoneNumber must not be blank"
+            );
+        }
+
         try {
             return new PhoneNumber(value);
         } catch (IllegalArgumentException exception) {
             throw new InvalidCustomerInformationException("Failed: Invalid phoneNumber");
         }
+    }
+
+    // Kiểm tra order code trước khi dùng nó trong truy vấn database.
+    private String validateOrderCode(String orderCode) {
+        if (orderCode == null || orderCode.isBlank()) {
+            throw new InvalidCustomerInformationException(
+                    "Failed: Order code must not be blank"
+            );
+        }
+
+        return orderCode.trim();
     }
 
     private String normalizeEmail(String email) {

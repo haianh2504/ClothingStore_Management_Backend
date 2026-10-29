@@ -14,4 +14,7 @@ public interface OrderService {
 
     // Lấy chi tiết order nhưng chỉ khi order thuộc guest hiện tại.
     GuestOrderDetailResponse getGuestOrderDetail(String guestId, String orderCode);
+
+    // Khôi phục order bằng order code và số điện thoại, không cần GUEST_ID cookie.
+    GuestOrderDetailResponse lookupOrder(String orderCode, String phoneNumber);
 }

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.OffsetDateTime;
@@ -83,6 +84,25 @@ public class OrderController {
                 HttpStatus.OK.value(),
                 "ORDER_DETAIL_RETRIEVED",
                 "Order detail retrieved successfully",
+                OffsetDateTime.now(),
+                order
+        ));
+    }
+
+    /**
+     * Khôi phục order bằng order code và số điện thoại khi không còn GUEST_ID.
+     */
+    @GetMapping("/lookup")
+    public ResponseEntity<ApiResponse<GuestOrderDetailResponse>> lookupOrder(
+            @RequestParam(name = "orderCode", required = false) String orderCode,
+            @RequestParam(name = "phoneNumber", required = false) String phoneNumber
+    ) {
+        GuestOrderDetailResponse order = orderService.lookupOrder(orderCode, phoneNumber);
+
+        return ResponseEntity.ok(ApiResponse.from(
+                HttpStatus.OK.value(),
+                "ORDER_LOOKUP_SUCCESS",
+                "Order retrieved successfully",
                 OffsetDateTime.now(),
                 order
         ));
