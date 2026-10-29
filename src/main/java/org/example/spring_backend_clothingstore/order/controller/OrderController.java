@@ -1,5 +1,7 @@
 package org.example.spring_backend_clothingstore.order.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.spring_backend_clothingstore.api_response_schema.ApiResponse;
@@ -10,9 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.example.spring_backend_clothingstore.guest.GuestIdResolver;
 
 import java.time.OffsetDateTime;
 
@@ -21,13 +23,16 @@ import java.time.OffsetDateTime;
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
+    private final GuestIdResolver guestIdResolver;
 
     // Place Order
     @PostMapping
     public ResponseEntity<ApiResponse<OrderResponse>> placeOrder(
-            @RequestHeader("X-Guest-Id") String guestId,
+            HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse,
             @Valid @RequestBody PlaceOrderRequest request
     ){
+        String guestId = guestIdResolver.resolve(httpRequest, httpResponse);
         OrderResponse order = orderService.placeOrder(guestId, request);
         int status = HttpStatus.CREATED.value();
 

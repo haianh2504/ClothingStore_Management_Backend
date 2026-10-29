@@ -51,6 +51,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf
                         // Browser đọc token từ XSRF-TOKEN và gửi lại qua X-XSRF-TOKEN.
+                        // CSRF vẫn được áp dụng cho các guest endpoint dùng cookie GUEST_ID:
+                        // thêm cart, cập nhật/xóa cart item và đặt order.
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(csrfTokenRequestHandler)
                 )

@@ -50,11 +50,6 @@ public class GlobalExceptionHandler {
         String code = "MISSING_REQUEST_HEADER";
         String message = "Required header '" + exception.getHeaderName() + "' is missing";
 
-        if ("X-Guest-Id".equals(exception.getHeaderName())) {
-            code = "X_GUEST_ID_MISSING";
-            message = "Failed: Required header 'X-Guest-Id' is missing";
-        }
-
         return ResponseEntity
                 .badRequest()
                 .body(ErrorResponse.from(400, code, message));

@@ -8,9 +8,7 @@ import org.example.spring_backend_clothingstore.cart_item.repository.CartItemRep
 import org.example.spring_backend_clothingstore.composition.customer_name.CustomerName;
 import org.example.spring_backend_clothingstore.composition.phone_number.PhoneNumber;
 import org.example.spring_backend_clothingstore.exception.business.CartEmptyException;
-import org.example.spring_backend_clothingstore.exception.business.InvalidGuestIdException;
 import org.example.spring_backend_clothingstore.exception.business.InvalidCustomerInformationException;
-import org.example.spring_backend_clothingstore.exception.business.MissingGuestIdException;
 import org.example.spring_backend_clothingstore.exception.business.OperationFailedException;
 import org.example.spring_backend_clothingstore.exception.business.ProductUnavailableException;
 import org.example.spring_backend_clothingstore.exception.resource.CartNotFoundException;
@@ -24,6 +22,7 @@ import org.example.spring_backend_clothingstore.product.entity.Product;
 import org.example.spring_backend_clothingstore.product.entity.product_enum.SaleStatus;
 import org.example.spring_backend_clothingstore.product_variant.entity.ProductVariant;
 import org.example.spring_backend_clothingstore.product_variant.repository.ProductVariantRepository;
+import org.example.spring_backend_clothingstore.guest.GuestIdValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +39,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final ProductVariantRepository productVariantRepository;
+    private final GuestIdValidator guestIdValidator;
 
     @Transactional
     @Override
@@ -197,13 +197,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void validateGuestId(String guestId) {
-        if (guestId == null || guestId.isBlank()) {
-            throw new MissingGuestIdException();
-        }
-
-        if (guestId.length() > 255) {
-            throw new InvalidGuestIdException();
-        }
+        guestIdValidator.validate(guestId);
     }
 
     private String generateOrderCode() {

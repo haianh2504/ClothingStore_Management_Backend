@@ -6,6 +6,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class InvalidGuestIdException extends BusinessException {
     public InvalidGuestIdException() {
-        super("GUEST_ID_INVALID", "Header 'X-Guest-Id' has an invalid format");
+        super("GUEST_ID_INVALID", "Guest ID cookie has an invalid format");
     }
 }

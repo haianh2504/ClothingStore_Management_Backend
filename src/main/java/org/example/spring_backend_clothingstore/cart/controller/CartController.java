@@ -1,5 +1,7 @@
 package org.example.spring_backend_clothingstore.cart.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.spring_backend_clothingstore.api_response_schema.ApiResponse;
@@ -9,6 +11,7 @@ import org.example.spring_backend_clothingstore.cart.dto.response.CartResponse;
 import org.example.spring_backend_clothingstore.cart.service.AddCartItemResult;
 import org.example.spring_backend_clothingstore.cart.service.CartService;
 import org.example.spring_backend_clothingstore.cart.service.UpdateCartItemResult;
+import org.example.spring_backend_clothingstore.guest.GuestIdResolver;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Pageable;
@@ -21,12 +24,15 @@ import java.time.OffsetDateTime;
 @RequiredArgsConstructor
 public class CartController {
     private final CartService cartService;
+    private final GuestIdResolver guestIdResolver;
 
     @PostMapping("/carts/items")
     public ResponseEntity<ApiResponse<CartResponse>> addProductVariantToCart(
-            @RequestHeader("X-Guest-Id") String guestId,
+            HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse,
             @Valid @RequestBody AddCartItemRequest request
     ) {
+        String guestId = guestIdResolver.resolve(httpRequest, httpResponse);
         AddCartItemResult result = cartService.addProductVariantToCart(
                 guestId,
                 request.variantId(),
@@ -52,9 +58,11 @@ public class CartController {
     // VIEW CART
     @GetMapping("/carts")
     public ResponseEntity<ApiResponse<CartResponse>> getCartByGuestId(
-            @RequestHeader("X-Guest-Id") String guestId,
+            HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse,
             Pageable pageable
     ) {
+        String guestId = guestIdResolver.resolve(httpRequest, httpResponse);
         CartResponse cart = cartService.getCartByGuestId(guestId, pageable);
         boolean empty = cart.items().isEmpty();
         int status = HttpStatus.OK.value();
@@ -70,10 +78,12 @@ public class CartController {
 
     @PatchMapping("/cartItems/{cartItemId}")
     public ResponseEntity<ApiResponse<CartResponse>> updateCartItemQuantity(
-            @RequestHeader("X-Guest-Id") String guestId,
+            HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse,
             @PathVariable Long cartItemId,
             @Valid @RequestBody UpdateCartItemRequest request
     ) {
+        String guestId = guestIdResolver.resolve(httpRequest, httpResponse);
         UpdateCartItemResult result = cartService.updateCartItemQuantity(
                 guestId,
                 cartItemId,
@@ -99,9 +109,11 @@ public class CartController {
 
     @DeleteMapping("/cartItems/{cartItemId}")
     public ResponseEntity<ApiResponse<CartResponse>> removeCartItem(
-            @RequestHeader("X-Guest-Id") String guestId,
+            HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse,
             @PathVariable Long cartItemId
     ) {
+        String guestId = guestIdResolver.resolve(httpRequest, httpResponse);
         CartResponse cart = cartService.removeCartItem(guestId, cartItemId);
         int status = HttpStatus.OK.value();
 

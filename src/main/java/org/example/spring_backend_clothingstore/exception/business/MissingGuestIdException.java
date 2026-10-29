@@ -6,6 +6,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class MissingGuestIdException extends BusinessException {
     public MissingGuestIdException() {
-        super("X_GUEST_ID_MISSING", "Failed: Required header 'X-Guest-Id' is missing");
+        super("GUEST_ID_MISSING", "Guest ID is missing");
     }
 }

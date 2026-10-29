@@ -2,10 +2,9 @@ package org.example.spring_backend_clothingstore.cart.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.spring_backend_clothingstore.exception.business.InsufficientStockException;
-import org.example.spring_backend_clothingstore.exception.business.InvalidGuestIdException;
 import org.example.spring_backend_clothingstore.exception.business.InvalidQuantityException;
-import org.example.spring_backend_clothingstore.exception.business.MissingGuestIdException;
 import org.example.spring_backend_clothingstore.exception.business.ProductInactiveForCartException;
+import org.example.spring_backend_clothingstore.guest.GuestIdValidator;
 import org.example.spring_backend_clothingstore.cart.entity.Cart;
 import org.example.spring_backend_clothingstore.cart.repository.CartRepository;
 import org.example.spring_backend_clothingstore.cart_item.entity.CartItem;
@@ -30,6 +29,7 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final ProductVariantRepository productVariantRepository;
+    private final GuestIdValidator guestIdValidator;
 
     @Transactional
     @Override
@@ -73,13 +73,7 @@ public class CartServiceImpl implements CartService {
     }
 
     private void validateGuestId(String guestId) {
-        if (guestId == null || guestId.isBlank()) {
-            throw new MissingGuestIdException();
-        }
-
-        if (guestId.length() > 255) {
-            throw new InvalidGuestIdException();
-        }
+        guestIdValidator.validate(guestId);
     }
 
     private void validateStock(int requestedQuantity, int availableQuantity) {

@@ -1,36 +1,43 @@
 # Core API Contract Flow Design:
 
-## UC having `X-Guest-Id` in header:##
-**1. Error Response - Missing `X-Guest-Id` in header:**
-Status: `400 Bad Request`
-Body:
-```json
-{
-   "status": 400,
-   "code": "X_GUEST_ID_MISSING",
-   "message": "Failed: Required header 'X-Guest-Id' is missing",
-   "timestamp": "2026-10-06T15:00:00+07:00"
-}
+## Guest Cart Identity
+
+Guest cart identity is managed by the backend through the `GUEST_ID` cookie.
+The client must not create, modify, or send an `X-Guest-Id` header.
+
+When a request does not contain a valid `GUEST_ID` cookie, the backend creates
+a new UUID, sets it in the response, and continues processing the same request:
+-
+```http
+Set-Cookie: GUEST_ID=<uuid>; HttpOnly; Path=/; SameSite=Lax; Max-Age=2592000
 ```
 
-**2. Error Response - Invalid `X-Guest-Id`:**
-Status: `400 Bad Request`
-Body:
-```json
-{
-  "status": 400,
-  "code": "GUEST_ID_INVALID",
-  "message": "Header 'X-Guest-Id' has an invalid format",
-  "timestamp": "2026-10-06T15:00:00+07:00"
-}
-```
+If the existing cookie has an invalid or modified value, the backend ignores
+it, creates a new UUID, overwrites the cookie, and continues processing the
+request. The backend accepts only the canonical UUID format.
+
+The `GUEST_ID` cookie identifies the guest cart only. It is not an
+administrator credential and must not be used as a CSRF token or session ID.
+
+The guest cart database record has one unique `guest_id`, so one guest ID maps
+to at most one cart.
+
+For browser clients, `GET /api/v1/csrf-token` must be called before the first
+guest mutation request. The client must send the returned CSRF token in the
+`X-XSRF-TOKEN` header for `POST`, `PATCH`, and `DELETE` guest endpoints.
 
 
 ## UC02: Add Product Variant to Cart
 
 ### REQUEST: ###
 
-**Header**: chứa `X-Guest-Id`
+**Cookie:** `GUEST_ID` is sent automatically by the browser.
+
+**Request Header:**
+
+```http
+X-XSRF-TOKEN: <value of the XSRF-TOKEN cookie>
+```
 
 **Endpoint:** `POST /api/v1/carts/items`
 
@@ -163,13 +170,14 @@ Body:
 }
 ```
 
-**5. Error Responses about `X-Guest-Id` in header**
+The response may set `GUEST_ID` when the request did not contain a valid guest
+cookie. The request is still processed normally.
 
 ## UC03: View Cart
 
 ### REQUEST:###
 
-**Header:** `X-Guest-Id`
+**Cookie:** `GUEST_ID` is sent automatically by the browser.
 
 `unitPrice` and every `lineTotal` are calculated from the associated `Product.price`. Product variants do not have independent prices.
 
@@ -313,14 +321,22 @@ Body:
 ```
 
 ### BAD PATH:
-**Error Responses about `X-Guest-Id` in header**
+
+If the `GUEST_ID` cookie is missing or invalid, the backend creates and sets a
+new cookie instead of returning a guest ID error.
 
 
 ## UC06: Place Order
 
 ### REQUESTS:
 
-**Header:** `X-Guest-Id`
+**Cookie:** `GUEST_ID` is sent automatically by the browser.
+
+**Request Header:**
+
+```http
+X-XSRF-TOKEN: <value of the XSRF-TOKEN cookie>
+```
 
 `unitPrice` and every `lineTotal` are calculated from the associated `Product.price`. Product variants do not have independent prices.
 
@@ -484,7 +500,8 @@ Body:
 }
 ```
 
-**6. Error Responses about `X-Guest-Id` in header**
+The response may set `GUEST_ID` when the request did not contain a valid guest
+cookie. The request is still processed normally.
 
 
 
@@ -832,7 +849,13 @@ Body:
 
 ### REQUEST:
 
-**Header:** `X-Guest-Id`
+**Cookie:** `GUEST_ID` is sent automatically by the browser.
+
+**Request Header:**
+
+```http
+X-XSRF-TOKEN: <value of the XSRF-TOKEN cookie>
+```
 
 `unitPrice` and every `lineTotal` are calculated from the associated `Product.price`. Product variants do not have independent prices.
 
@@ -1023,7 +1046,13 @@ Body:
 
 ### REQUEST:
 
-**Header**: `X-Guest-Id`
+**Cookie:** `GUEST_ID` is sent automatically by the browser.
+
+**Request Header:**
+
+```http
+X-XSRF-TOKEN: <value of the XSRF-TOKEN cookie>
+```
 
 `unitPrice` and every `lineTotal` are calculated from the associated `Product.price`. Product variants do not have independent prices.
 

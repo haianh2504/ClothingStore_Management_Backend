@@ -44,7 +44,6 @@ ALTER TABLE product_variants
 
 CREATE TABLE carts(
                       id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY ,
-                      guest_id VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE cart_items(
@@ -96,3 +95,5 @@ ALTER TABLE order_items
 ALTER TABLE order_items
     ADD CONSTRAINT uq_order_item_variant
         UNIQUE (variant_id,order_code);
+
+ALTER TABLE carts ADD CONSTRAINT uq_cart_guest_id UNIQUE (guest_id);
