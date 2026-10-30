@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.spring_backend_clothingstore.admin.dto.LoginRequest;
 import org.example.spring_backend_clothingstore.admin.dto.LoginResponse;
 import org.example.spring_backend_clothingstore.admin.dto.LogoutResponse;
+import org.example.spring_backend_clothingstore.admin.dto.CurrentSessionResponse;
 import org.example.spring_backend_clothingstore.api_response_schema.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +21,7 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +29,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.OffsetDateTime;
 import org.springframework.beans.factory.annotation.Value;
 
+/**
+ * Cung cấp các API đăng nhập, xem session hiện tại và đăng xuất cho quản trị viên.
+ *
+ * Session là dữ liệu phía máy chủ (được lưu bằng Spring Session/Redis); trình duyệt
+ * chỉ gửi Cookie ADMIN_SESSION để Spring Security tìm lại Authentication tương ứng.
+ */
 @RestController
 @RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
@@ -73,6 +81,32 @@ public class AuthController {
                 "Admin login successful",
                 OffsetDateTime.now(),
                 new LoginResponse(true)
+        ));
+    }
+
+    /**
+     * Trả về trạng thái đăng nhập và email của quản trị viên từ Authentication
+     * đã được Spring Security khôi phục bằng Cookie ADMIN_SESSION.
+     *
+     * Cookie và session ID không được đọc thủ công hoặc đưa vào response; request
+     * không có session hợp lệ sẽ bị Security Filter Chain trả về HTTP 401 trước
+     * khi method này được gọi.
+     */
+    @GetMapping("/sessions/current")
+    public ResponseEntity<ApiResponse<CurrentSessionResponse>> getCurrentSession(
+            Authentication authentication
+    ) {
+        CurrentSessionResponse sessionResponse = new CurrentSessionResponse(
+                authentication.isAuthenticated(),
+                authentication.getName()
+        );
+
+        return ResponseEntity.ok(ApiResponse.from(
+                200,
+                "ADMIN_SESSION_RETRIEVED",
+                "Current admin session retrieved successfully",
+                OffsetDateTime.now(),
+                sessionResponse
         ));
     }
 
