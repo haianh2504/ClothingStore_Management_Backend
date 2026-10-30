@@ -218,7 +218,7 @@ Administrator
 
 ---
 
-## UC05 Remove Item from Cart
+## UC05 Remove Item from Cart (✓)
 
 **Actor:** Customer
 
@@ -297,7 +297,7 @@ Administrator
 
 ---
 
-## UC07 Look Up Order
+## UC07 Look Up Order (✓)
 
 **Actor:** Customer
 
@@ -326,7 +326,7 @@ Administrator
 
 ---
 
-## UC08 Administrator Login
+## UC08 Administrator Login (✓)
 
 **CSRF requirement:** Before the browser sends this `POST` request, it first
 requests `GET /api/v1/csrf-token`. The backend sets an `XSRF-TOKEN` cookie.
@@ -364,7 +364,7 @@ the CSRF token protects this cookie-based request from cross-site submission.
 
 ---
 
-## UC08.1 View Current Administrator Session
+## UC08.1 View Current Administrator Session (✓)
 
 **Actor:** Administrator
 
@@ -394,7 +394,7 @@ This read-only `GET` request does not require the `X-XSRF-TOKEN` header.
 
 ---
 
-## UC08.2 Administrator Logout
+## UC08.2 Administrator Logout (✓)
 
 **Actor:** Administrator
 
@@ -439,7 +439,7 @@ authorization rule level.
 **Main flow:**
 
 1. The administrator opens the product creation page.
-2. The administrator enters the product name, description, category, base price, and sale status.
+2. The administrator enters the product name, description, category, base price. ( The sale status will be INACTIVE initially )
 3. The administrator submits the product information.
 4. The system validates the product information.
 5. The system stores the product.
@@ -448,6 +448,12 @@ authorization rule level.
 
 **Alternative flows:**
 
+- If the administrator is not authenticated, the system returns an unauthorized
+  response and does not create a product.
+- If the authenticated user does not have the `ADMIN` role, the system returns
+  a forbidden response and does not create a product.
+- If the CSRF token is missing or invalid, the system rejects the request and
+  does not create a product.
 - If required product information is missing or invalid, the system returns validation errors.
 - If the base price is negative, the system rejects the request.
 
@@ -471,7 +477,8 @@ authorization rule level.
 
 1. The administrator opens the product edit page.
 2. The system displays the current product information.
-3. The administrator changes one or more product fields.
+3. The administrator changes one or more of the product's basic information
+   fields: `productName`, `description`, `category`, and `basePrice`.
 4. The administrator submits the changes.
 5. The system validates the submitted product information.
 6. The system applies the valid changes to the product.
@@ -480,14 +487,25 @@ authorization rule level.
 
 **Alternative flows:**
 
+- If the administrator is not authenticated, the system returns an unauthorized
+  response and does not update the product.
+- If the authenticated user does not have the `ADMIN` role, the system returns
+  a forbidden response and does not update the product.
+- If the CSRF token is missing or invalid, the system rejects the request and
+  does not update the product.
 - If the product does not exist, the system returns a not found response.
 - If the submitted data is invalid, the system rejects the request.
-- If the base price is negative, the system rejects the request.
+- If `basePrice` is zero or negative, the system rejects the request.
+- If the new `productName` is already used by another product, the system
+  rejects the update.
 
 **Postconditions:**
 
 - The valid product changes are stored.
+- Only `productName`, `description`, `category`, and `basePrice` can be
+  updated through UC10.
 - Product variants remain unchanged unless they are modified through their dedicated use cases.
+- `saleStatus` remains unchanged and is modified only through UC14.
 - Existing order item snapshots remain unchanged.
 
 ---

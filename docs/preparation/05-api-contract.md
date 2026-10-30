@@ -1553,3 +1553,267 @@ cookie.
 The operation is idempotent and therefore does not return an error when the
 session cookie is missing, invalid, or already expired. It returns the same
 successful response described above.
+
+
+## UC09 Create Product
+
+**Endpoint:** `POST /api/v1/admin/products`
+**Request Header:** `X-XSRF-TOKEN: <CSRF-TOKEN>`
+**Role:** `ADMIN`
+**Request Body:**
+```json
+{
+   "productName": "XXXXXXXX",
+   "description": "......",
+   "category": "TOPS",
+   "basePrice": 1000000
+}
+```
+
+### AUTHENTICATION AND AUTHORIZATION ERRORS:
+
+**1. Error Response - administrator is not authenticated:**
+Status: `401 Unauthorized`
+
+The request does not contain a valid authenticated administrator session. The
+server does not create a product.
+
+```json
+{
+   "status": 401,
+   "code": "ADMIN_SESSION_UNAUTHORIZED",
+   "message": "Administrator authentication is required",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+**2. Error Response - authenticated user is not an administrator:**
+Status: `403 Forbidden`
+
+The session is authenticated, but the authenticated user does not have the
+`ADMIN` role. The server does not create a product.
+
+```json
+{
+   "status": 403,
+   "code": "ADMIN_ACCESS_FORBIDDEN",
+   "message": "Administrator access is required",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+**3. Error Response - CSRF token is missing or invalid:**
+Status: `403 Forbidden`
+
+The request is authenticated or reaches the protected endpoint, but the
+`X-XSRF-TOKEN` header is missing or does not match the CSRF cookie. The server
+rejects the request before product creation.
+
+```json
+{
+   "status": 403,
+   "code": "CSRF_TOKEN_INVALID",
+   "message": "Invalid or missing CSRF token",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+### SUCCESS PATH:
+**1. Success Response:**
+Status: `201 CREATED`
+Body:
+```json
+{
+   "status": 201,
+   "code": "PRODUCT_CREATED_SUCCESSFULLY",
+   "message": "Successfully creating new product",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "data":{
+       "productId": 123,
+       "productName": "XXXXXXXX",
+       "description": "......",
+       "category": "TOPS",
+       "basePrice": 1000000,
+       "saleStatus": "INACTIVE"
+   }
+}
+```
+
+### BAD PATH:
+**1. Error Response - required product information is missing or null:**
+Status: `400 Bad Request`
+Body:
+```json
+{
+   "status": 400,
+   "code": "REQUIRED_INFORMATION_MISSING",
+   "message": "Failed: Missing required information",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "error":[
+       {
+           "field": "productName",
+           "message": "ProductName is required"
+       },
+       {
+           "field": "basePrice",
+           "message": "BasePrice is required"
+       },
+     {
+       "field": "category",
+       "message": "Category is required"
+     },
+     {
+       "field": "description",
+       "message": "Description is required"
+     }
+   ]
+}
+```
+
+**2. Error Response - required product information is invalid:**
+Status: `400 Bad Request`
+Body:
+```json
+{
+   "status": 400,
+   "code": "INVALID_INFORMATION_PROVIDED",
+   "message": "Failed: Invalid details provided",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "error": [
+      {
+         "field": "productName",
+         "message": "Invalid Product's name"
+      },
+      {
+         "field": "category",
+         "message": "Invalid category"
+       },
+       {
+          "field": "basePrice",
+          "message": "Invalid base price"
+       },
+       {
+          "field": "description",
+          "message": "Invalid description"
+       }
+    ]
+}
+```
+
+
+## UC10 Update Product ( Basic Information Only )
+
+**Endpoint:** `PATCH /api/v1/admin/products/{productId}`
+**Request Header:** `X-XSRF-TOKEN: <CSRF-TOKEN>`
+**Role:** `ADMIN`
+**Path Variable:** `productId - LONG - required`
+
+This endpoint supports partial updates. The request body must contain only the
+basic product fields that need to change: `productName`, `description`,
+`category`, and/or `basePrice`. Omitted fields retain their current values.
+At least one updatable field must be provided.
+
+The endpoint cannot update `saleStatus`, product variants, stock, size, color,
+or images. Sale status changes are handled by UC14, and variant changes are
+handled by UC11–UC13.
+
+**Request Body:**
+```json
+{
+   "basePrice": 2000000
+}
+```
+
+### AUTHENTICATION, AUTHORIZATION, AND CSRF ERRORS:
+
+UC10 inherits the authentication, authorization, and CSRF error contract from
+UC09. The same response envelope, status codes, error codes, and behavior apply:
+
+- `401 Unauthorized` with `ADMIN_SESSION_UNAUTHORIZED` when the administrator
+  session is missing, invalid, or expired.
+- `403 Forbidden` with `ADMIN_ACCESS_FORBIDDEN` when the authenticated user does
+  not have the `ADMIN` role.
+- `403 Forbidden` with `CSRF_TOKEN_INVALID` when the CSRF token is missing or
+  invalid.
+
+The server does not update the product in any of these cases. See the UC09
+authentication and authorization error responses for the canonical response
+envelopes.
+
+
+## SUCCESS PATH:
+**1. Success Response:**
+Status: `200 OK`
+Body:
+```json
+{
+   "status": 200,
+   "code": "PRODUCT_UPDATE_SUCCESSFULLY",
+   "message": "Successfully updating product",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "data":{
+       "productId": 123,
+       "productName": "XXXXXXXX",
+       "description": "......",
+       "category": "BOTTOMS",
+       "basePrice": 2000000,
+       "saleStatus": "INACTIVE"
+   }
+}
+```
+
+
+### BAD PATH:
+**1. Error Response - Product not found:**
+Status: `404 Not Found`
+Body:
+```json
+{
+   "status": 404,
+   "code": "PRODUCT_NOT_FOUND",
+   "message": "Product not found",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+**2. Error Response - new product information is invalid:**
+Status: `400 Bad Request`
+Body:
+```json
+{
+   "status": 400,
+   "code": "INVALID_INFORMATION_PROVIDED",
+   "message": "Failed: Invalid details provided",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "error": [
+      {
+         "field": "productName",
+         "message": "Invalid Product's name"
+      },
+      {
+         "field": "description",
+         "message": "Invalid description"
+      },
+      {
+         "field": "category",
+         "message": "Invalid category"
+      },
+      {
+         "field": "basePrice",
+         "message": "Base price must be greater than zero"
+      }
+   ]
+}
+```
+
+**3. Error Response - product name already exists:**
+Status: `409 Conflict`
+Body:
+```json
+{
+   "status": 409,
+   "code": "PRODUCT_NAME_ALREADY_EXISTS",
+   "message": "Product name is already in use",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
