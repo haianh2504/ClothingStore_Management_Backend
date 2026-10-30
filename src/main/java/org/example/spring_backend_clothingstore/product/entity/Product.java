@@ -58,5 +58,20 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<ProductVariant> variants = new ArrayList<>();
 
+    /** Tạo product mới với saleStatus mặc định là INACTIVE. */
+    public static Product create(
+            ProductName name,
+            String description,
+            ProductCategory category,
+            BigDecimal price
+    ) {
+        Product product = new Product();
+        product.name = name;
+        product.description = description;
+        product.category = category;
+        product.price = price;
+        product.saleStatus = SaleStatus.INACTIVE;
+        return product;
+    }
 
 }

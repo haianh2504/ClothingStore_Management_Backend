@@ -20,6 +20,7 @@ import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final AdminAuthenticationEntryPoint adminAuthenticationEntryPoint;
+    private final AdminAccessDeniedHandler adminAccessDeniedHandler;
 
     // khai bao Bean PasswordEncoder
     @Bean
@@ -71,6 +72,7 @@ public class SecurityConfig {
                 // Thêm bộ xử lý exception riêng ở SecurityFilterChain về session ( đặc biệt là UC08.1 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(adminAuthenticationEntryPoint)
+                        .accessDeniedHandler(adminAccessDeniedHandler)
                 );
         return http.build(); // tạo SecurityFilterChain cho FilterChainProxy quản lý
     }

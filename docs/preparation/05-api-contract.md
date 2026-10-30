@@ -1640,19 +1640,7 @@ Body:
 ```
 
 ### BAD PATH:
-**1. Error Response - product not found:**
-Status: `404 Not Found`
-Body:
-```json
-{
-   "status": 404,
-   "code": "PRODUCT_NOT_FOUND",
-   "message": "Product not found",
-   "timestamp": "2026-10-02T14:30:00+07:00"
-}
-```
-
-**2. Error Response - required variant information is missing or null:**
+**1. Error Response - required product information is missing or null:**
 Status: `400 Bad Request`
 Body:
 ```json
@@ -1709,6 +1697,18 @@ Body:
           "message": "Invalid description"
        }
     ]
+}
+```
+
+**3. Error Response - product name already exists:**
+Status: `409 Conflict`
+Body:
+```json
+{
+   "status": 409,
+   "code": "PRODUCT_NAME_ALREADY_EXISTS",
+   "message": "Product name is already in use",
+   "timestamp": "2026-10-02T14:30:00+07:00"
 }
 ```
 

@@ -59,6 +59,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(
             MethodArgumentNotValidException exception
     ) {
+        boolean requiredInformationMissing = exception.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .anyMatch(error -> error.getCode() != null
+                        && (error.getCode().equals("NotNull")
+                        || error.getCode().equals("NotBlank")));
+
         List<Map<String, String>> errors = exception.getBindingResult()
                 .getFieldErrors()
                 .stream()
@@ -72,8 +79,12 @@ public class GlobalExceptionHandler {
                 .badRequest()
                 .body(ErrorResponse.from(
                         400,
-                        "INVALID_INFORMATION_PROVIDED",
-                        "Failed: Invalid details provided",
+                        requiredInformationMissing
+                                ? "REQUIRED_INFORMATION_MISSING"
+                                : "INVALID_INFORMATION_PROVIDED",
+                        requiredInformationMissing
+                                ? "Failed: Missing required information"
+                                : "Failed: Invalid details provided",
                         errors
                 ));
     }

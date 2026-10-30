@@ -11,6 +11,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
+    // Kiểm tra nhanh tên product đã được sử dụng hay chưa.
+    boolean existsByName_Name(String name);
+
     // Find All by sale Status
     Page<Product> findAllBySaleStatus(
             SaleStatus saleStatus,
