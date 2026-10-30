@@ -14,6 +14,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // Kiểm tra nhanh tên product đã được sử dụng hay chưa.
     boolean existsByName_Name(String name);
 
+    // Kiểm tra tên đã thuộc product khác hay chưa khi cập nhật.
+    boolean existsByName_NameAndIdNot(String name, Long productId);
+
     // Find All by sale Status
     Page<Product> findAllBySaleStatus(
             SaleStatus saleStatus,

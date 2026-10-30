@@ -3,6 +3,7 @@ package org.example.spring_backend_clothingstore.product.service;
 import lombok.RequiredArgsConstructor;
 import org.example.spring_backend_clothingstore.exception.business.ProductNameAlreadyExistsException;
 import org.example.spring_backend_clothingstore.product.dto.request.CreateProductRequest;
+import org.example.spring_backend_clothingstore.product.dto.request.UpdateProductRequest;
 import org.example.spring_backend_clothingstore.product.dto.response.CategoryProductResponse;
 import org.example.spring_backend_clothingstore.product.dto.response.CategoryProductPageResponse;
 import org.example.spring_backend_clothingstore.product.dto.response.CreatedProductResponse;
@@ -12,6 +13,7 @@ import org.example.spring_backend_clothingstore.product.entity.Product;
 import org.example.spring_backend_clothingstore.product.entity.product_enum.ProductCategory;
 import org.example.spring_backend_clothingstore.product.entity.product_enum.SaleStatus;
 import org.example.spring_backend_clothingstore.product.entity.product_name.ProductName;
+import org.example.spring_backend_clothingstore.exception.resource.ProductNotFoundException;
 import org.example.spring_backend_clothingstore.product.repository.ProductRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -58,6 +60,46 @@ public class ProductServiceImpl implements ProductService {
         } catch (DataIntegrityViolationException exception) {
             // Xử lý race condition mà pre-check không thể ngăn chặn hoàn toàn.
             throw new ProductNameAlreadyExistsException(productName.name());
+        }
+    }
+
+    /**
+     * Cập nhật các field được gửi lên; field không gửi sẽ giữ nguyên giá trị cũ.
+     */
+    @Override
+    @Transactional
+    public CreatedProductResponse updateProduct(Long productId, UpdateProductRequest request) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(productId));
+
+        if (request.productName() != null) {
+            ProductName productName = new ProductName(request.productName());
+            boolean nameChanged = !productName.equals(product.getName());
+
+            if (nameChanged && productRepository.existsByName_NameAndIdNot(
+                    productName.name(), productId
+            )) {
+                throw new ProductNameAlreadyExistsException(productName.name());
+            }
+
+            product.setName(productName);
+        }
+
+        if (request.description() != null) {
+            product.setDescription(request.description().trim());
+        }
+        if (request.category() != null) {
+            product.setCategory(ProductCategory.valueOf(request.category()));
+        }
+        if (request.basePrice() != null) {
+            product.setPrice(request.basePrice());
+        }
+
+        try {
+            return CreatedProductResponse.from(productRepository.saveAndFlush(product));
+        } catch (DataIntegrityViolationException exception) {
+            // Bảo vệ thêm trong trường hợp hai request đổi sang cùng một tên.
+            throw new ProductNameAlreadyExistsException(product.getName().name());
         }
     }
 

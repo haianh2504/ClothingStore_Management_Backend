@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
- * Response tối thiểu trả về sau khi tạo product thành công.
+ * Response quản trị trả về sau khi tạo hoặc cập nhật product thành công.
  */
 public record CreatedProductResponse(
         Long productId,
@@ -25,7 +25,7 @@ public record CreatedProductResponse(
         Objects.requireNonNull(saleStatus, "Sale status cannot be null");
     }
 
-    /** Chuyển entity Product đã lưu thành response theo contract UC09. */
+    /** Chuyển entity Product đã lưu thành response theo contract admin product. */
     public static CreatedProductResponse from(Product product) {
         return new CreatedProductResponse(
                 product.getId(),
