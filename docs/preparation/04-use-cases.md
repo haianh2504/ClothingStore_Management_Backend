@@ -536,10 +536,9 @@ authorization rule level.
 
 - If the product does not exist, the system returns a not found response.
 - If required variant information is missing or invalid, the system returns validation errors.
-- If the stock quantity is negative, the system rejects the request.
+- If the stock quantity is negative, the system rejects the request ( can be `zero` -> become `unavailable` ).
 - The variant uses the price stored on its associated product; no separate variant price is submitted or validated.
 - If another variant with the same color and size already exists for the product, the system rejects the duplicate.
-- If image upload fails, the variant creation operation fails and no incomplete variant is retained.
 
 **Postconditions:**
 

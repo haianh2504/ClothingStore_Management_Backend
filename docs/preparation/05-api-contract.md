@@ -1640,7 +1640,19 @@ Body:
 ```
 
 ### BAD PATH:
-**1. Error Response - required product information is missing or null:**
+**1. Error Response - product not found:**
+Status: `404 Not Found`
+Body:
+```json
+{
+   "status": 404,
+   "code": "PRODUCT_NOT_FOUND",
+   "message": "Product not found",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+**2. Error Response - required variant information is missing or null:**
 Status: `400 Bad Request`
 Body:
 ```json
@@ -1814,6 +1826,149 @@ Body:
    "status": 409,
    "code": "PRODUCT_NAME_ALREADY_EXISTS",
    "message": "Product name is already in use",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+
+## UC11 Add Product Variant
+
+**Endpoint:** `POST /api/v1/admin/products/{productId}/variants`
+**Content-Type:** `multipart/form-data`
+**Request Header:** `X-XSRF-TOKEN: <CSRF-TOKEN>`
+**Role:** `ADMIN`
+**Path Variable:** `productId - LONG - required`
+
+The frontend provides an image upload control. The administrator selects an
+image file saved on the local machine, and the browser sends the file as a
+multipart form part. The server validates the multipart request using the
+configured servlet multipart limits, including the maximum permitted file size.
+**Request Body:**
+| Part | Type | Required | Description |
+|---|---|---:|---|
+| `color` | text | Yes | Variant color. |
+| `size` | text | Yes | Product size: `S`, `M`, `L`, or `XL`. |
+| `quantity` | integer text | Yes | Stock quantity; must be zero or greater. |
+| `image` | file | Yes | Uploaded product variant image. |
+
+### AUTHENTICATION, AUTHORIZATION, AND CSRF ERRORS:
+
+UC11 inherits the authentication, authorization, and CSRF error contract from
+UC09. The same response envelope, status codes, error codes, and behavior apply:
+
+- `401 Unauthorized` with `ADMIN_SESSION_UNAUTHORIZED` when the administrator
+  session is missing, invalid, or expired.
+- `403 Forbidden` with `ADMIN_ACCESS_FORBIDDEN` when the authenticated user does
+  not have the `ADMIN` role.
+- `403 Forbidden` with `CSRF_TOKEN_INVALID` when the CSRF token is missing or
+  invalid.
+
+The server does not create a product variant in any of these cases. See the
+UC09 authentication and authorization error responses for the canonical
+response envelopes.
+
+### SUCCESS PATH:
+**1. Success Response:**
+Status: `201 CREATED`
+Body:
+```json
+{
+   "status": 201,
+   "code": "PRODUCT_VARIANT_CREATED_SUCCESSFULLY",
+   "message": "Successfully creating new variant for a persisted product",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "data":{
+       "productId": 123,
+       "variantId": 123,
+       "color": "blue",
+       "size": "M",
+       "quantity": 10,
+       "imageUrl": "https://storage.example.com/image01-shirt.jpg"
+   }
+}
+```
+
+### BAD PATH:
+**1. Error Response - product not found:**
+Status: `404 Not Found`
+Body:
+```json
+{
+   "status": 404,
+   "code": "PRODUCT_NOT_FOUND",
+   "message": "Product not found",
+   "timestamp": "2026-10-02T14:30:00+07:00"
+}
+```
+
+**2. Error Response - required variant information is missing or null:**
+Status: `400 Bad Request`
+Body:
+```json
+{
+   "status": 400,
+   "code": "REQUIRED_INFORMATION_MISSING",
+   "message": "Failed: Missing required information",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "error":[
+       {
+           "field": "color",
+           "message": "Color is required"
+       },
+       {
+           "field": "quantity",
+           "message": "Quantity is required"
+       },
+       {
+           "field": "size",
+           "message": "Size is required"
+       },
+       {
+           "field": "image",
+           "message": "Image file is required"
+       }
+   ]
+}
+```
+
+**3. Error Response - required variant information is invalid:**
+Status: `400 Bad Request`
+Body:
+```json
+{
+   "status": 400,
+   "code": "INVALID_INFORMATION_PROVIDED",
+   "message": "Failed: Invalid details provided",
+   "timestamp": "2026-10-02T14:30:00+07:00",
+   "error": [
+      {
+         "field": "color",
+         "message": "Invalid color"
+      },
+      {
+         "field": "quantity",
+         "message": "Quantity must be zero or greater"
+      },
+      {
+         "field": "image",
+         "message": "Invalid image file"
+      },
+      {
+         "field": "size",
+         "message": "Invalid size"
+      }
+   ]
+}
+```
+
+**4. Error Response - same color and size already exists:**
+Status: `409 Conflict`
+Body:
+```json
+{
+   "status": 409,
+   "code": "PRODUCT_VARIANT_DUPLICATED",
+   "message": "Failed: this color and size combination already exists!",
    "timestamp": "2026-10-02T14:30:00+07:00"
 }
 ```
