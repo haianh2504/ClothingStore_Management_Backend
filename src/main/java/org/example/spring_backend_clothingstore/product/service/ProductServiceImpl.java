@@ -44,7 +44,7 @@ public class ProductServiceImpl implements ProductService {
     public CreatedProductResponse createProduct(CreateProductRequest request) {
         ProductName productName = new ProductName(request.productName());
 
-        if (productRepository.existsByName_Name(productName.name())) {
+        if (productRepository.existsByName(productName)) {
             throw new ProductNameAlreadyExistsException(productName.name());
         }
 
@@ -76,8 +76,8 @@ public class ProductServiceImpl implements ProductService {
             ProductName productName = new ProductName(request.productName());
             boolean nameChanged = !productName.equals(product.getName());
 
-            if (nameChanged && productRepository.existsByName_NameAndIdNot(
-                    productName.name(), productId
+            if (nameChanged && productRepository.existsByNameAndIdNot(
+                    productName, productId
             )) {
                 throw new ProductNameAlreadyExistsException(productName.name());
             }
