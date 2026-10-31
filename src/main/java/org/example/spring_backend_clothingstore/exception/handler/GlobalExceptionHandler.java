@@ -63,8 +63,7 @@ public class GlobalExceptionHandler {
                 .getFieldErrors()
                 .stream()
                 .anyMatch(error -> error.getCode() != null
-                        && (error.getCode().equals("NotNull")
-                        || error.getCode().equals("NotBlank")));
+                        && error.getCode().equals("NotNull"));
 
         List<Map<String, String>> errors = exception.getBindingResult()
                 .getFieldErrors()
