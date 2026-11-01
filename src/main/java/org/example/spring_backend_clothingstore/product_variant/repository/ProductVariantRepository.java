@@ -2,6 +2,7 @@ package org.example.spring_backend_clothingstore.product_variant.repository;
 
 import org.example.spring_backend_clothingstore.product.entity.product_enum.SaleStatus;
 import org.example.spring_backend_clothingstore.product_variant.entity.ProductVariant;
+import org.example.spring_backend_clothingstore.product_variant.entity.ProductSize;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -15,6 +16,13 @@ import java.util.Optional;
 
 @Repository
 public interface ProductVariantRepository extends JpaRepository<ProductVariant, Long> {
+    // Kiểm tra tổ hợp color-size đang được dùng bởi variant chưa bị xóa.
+    boolean existsByProduct_IdAndSizeAndColorAndDeletedAtIsNull(
+            Long productId,
+            ProductSize size,
+            String color
+    );
+
     // Find by variant Id
     Optional<ProductVariant> findById(Long id);
     // Find all variants of a productId and sale status

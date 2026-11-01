@@ -53,4 +53,21 @@ public class ProductVariant {
 
     @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
+
+    /** Tạo variant mới và gắn variant vào product đã tồn tại. */
+    public static ProductVariant create(
+            Product product,
+            ProductSize size,
+            int quantity,
+            String color,
+            String imageUrl
+    ) {
+        ProductVariant variant = new ProductVariant();
+        variant.product = product;
+        variant.size = size;
+        variant.quantity = quantity;
+        variant.color = color;
+        variant.imageUrl = imageUrl;
+        return variant;
+    }
 }

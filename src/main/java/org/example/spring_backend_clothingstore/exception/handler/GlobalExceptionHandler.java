@@ -1,6 +1,7 @@
 package org.example.spring_backend_clothingstore.exception.handler;
 
 import org.example.spring_backend_clothingstore.exception.business.BusinessException;
+import org.example.spring_backend_clothingstore.exception.business.ProductVariantInformationException;
 import org.example.spring_backend_clothingstore.exception.resource.ResourceException;
 import org.example.spring_backend_clothingstore.exception.response.ErrorResponse;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -27,6 +28,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(status)
                 .body(ErrorResponse.from(status.value(), code, exception.getMessage()));
+    }
+
+    /** Trả danh sách lỗi chi tiết cho dữ liệu variant không hợp lệ. */
+    @ExceptionHandler(ProductVariantInformationException.class)
+    public ResponseEntity<ErrorResponse> handleProductVariantInformation(
+            ProductVariantInformationException exception
+    ) {
+        return ResponseEntity.badRequest().body(ErrorResponse.from(
+                400, exception.getCode(), exception.getMessage(), exception.getErrors()
+        ));
     }
 
     @ExceptionHandler(org.example.spring_backend_clothingstore.exception.business.ProductUnavailableException.class)

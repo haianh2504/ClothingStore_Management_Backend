@@ -7,8 +7,13 @@ import org.example.spring_backend_clothingstore.product.dto.request.CreateProduc
 import org.example.spring_backend_clothingstore.product.dto.request.UpdateProductRequest;
 import org.example.spring_backend_clothingstore.product.dto.response.CreatedProductResponse;
 import org.example.spring_backend_clothingstore.product.service.ProductService;
+import org.example.spring_backend_clothingstore.product_variant.dto.request.AddProductVariantRequest;
+import org.example.spring_backend_clothingstore.product_variant.dto.response.CreatedProductVariantResponse;
+import org.example.spring_backend_clothingstore.product_variant.service.ProductVariantService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +31,7 @@ import java.time.OffsetDateTime;
 @RequiredArgsConstructor
 public class AdminProductController {
     private final ProductService productService;
+    private final ProductVariantService productVariantService;
 
     /** Tạo product mới và trả về product với saleStatus INACTIVE. */
     @PostMapping
@@ -59,6 +65,25 @@ public class AdminProductController {
                 "Successfully updating product",
                 OffsetDateTime.now(),
                 product
+        ));
+    }
+
+    /** Tạo variant cho product bằng dữ liệu multipart và ảnh upload. */
+    @PostMapping(value = "/{productId}/variants", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<CreatedProductVariantResponse>> createProductVariant(
+            @PathVariable Long productId,
+            @Valid @ModelAttribute AddProductVariantRequest request
+            /** @ModelAttribute yêu cầu Spring lấy các fields trong multipart/form-data và bind vào requestDTO **/
+    ) {
+        CreatedProductVariantResponse variant = productVariantService.createProductVariant(productId, request);
+        int status = HttpStatus.CREATED.value();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.from(
+                status,
+                "PRODUCT_VARIANT_CREATED_SUCCESSFULLY",
+                "Successfully creating new variant for a persisted product",
+                OffsetDateTime.now(),
+                variant
         ));
     }
 }
